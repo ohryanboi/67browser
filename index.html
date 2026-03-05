@@ -17,51 +17,177 @@
   <div class="boot-text">Starting 67Labs OS...</div>
 </div>
 
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+  <div id="loginClock">
+    <div id="loginTime">12:00</div>
+    <div id="loginDate">Thursday, January 1</div>
+  </div>
+  <div id="loginCard">
+    <div id="loginAvatar">👤</div>
+    <div id="loginUsername">User</div>
+    <div id="loginPasswordWrap">
+      <input id="loginPassword" type="password" placeholder="Password" autocomplete="off">
+      <button id="loginSubmit" title="Sign in">
+        <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <div id="loginHint">Press Enter or click → to sign in</div>
+  </div>
+</div>
+
 <!-- DESKTOP -->
 <div id="desktop">
 
   <!-- BROWSER WINDOW -->
   <div id="browserWindow" class="window">
     <div class="window-header">
-      <div class="window-title">Google</div>
+      <div class="window-title-area">
+        <img class="window-icon" src="https://www.google.com/favicon.ico" onerror="this.style.display='none'">
+        <span class="window-title">Browser</span>
+      </div>
       <div class="window-controls">
-        <button id="minBtn">–</button>
-        <button id="maxBtn">⬜</button>
-        <button id="closeBtn">✕</button>
+        <button id="minBtn" title="Minimize"></button>
+        <button id="maxBtn" title="Maximize"></button>
+        <button id="closeBtn" title="Close"></button>
       </div>
     </div>
 
-    <!-- TAB BAR -->
-    <div id="tabBar">
-      <button id="newTabBtn">+</button>
-    </div>
-
-    <!-- BOOKMARKS BAR -->
-    <div id="bookmarksBar"></div>
-
     <!-- ADDRESS BAR -->
     <div class="address-bar">
-      <button id="backBtn" disabled>&#9664;</button>
-      <button id="fwdBtn" disabled>&#9654;</button>
-      <button id="homeBtn">🏠</button>
-      <button id="refreshBtn">⟳</button>
-      <input id="urlInput" placeholder="Search or enter URL">
-      <button id="bookmarkBtn" title="Bookmark this page">☆</button>
-      <button id="historyBtn" title="History">🕐</button>
+      <button id="backBtn" disabled title="Back">
+        <svg width="12" height="12" viewBox="0 0 12 12"><path d="M8 1L3 6l5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button id="fwdBtn" disabled title="Forward">
+        <svg width="12" height="12" viewBox="0 0 12 12"><path d="M4 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button id="refreshBtn" title="Refresh">
+        <svg width="13" height="13" viewBox="0 0 13 13"><path d="M11 6.5A4.5 4.5 0 1 1 6.5 2a4.48 4.48 0 0 1 3 1.15L11 1.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="11,1.5 11,4 8.5,4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="url-pill">
+        <svg class="url-icon" width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z" stroke="currentColor" stroke-width="1.8"/><line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="1.8"/></svg>
+        <input id="urlInput" placeholder="Search or enter web address">
+      </div>
     </div>
-
-    <!-- HISTORY PANEL -->
-    <div id="historyPanel"></div>
 
     <iframe id="browserFrame"></iframe>
   </div>
 
+  <!-- START MENU -->
+  <div id="startMenu">
+    <div id="startMenuHeader">All Apps</div>
+    <div id="startAppsGrid">
+      <button class="startAppBtn" onclick="launchApp('notepad')">
+        <span class="startAppIcon">📝</span>
+        <span class="startAppLabel">Notepad</span>
+      </button>
+      <button class="startAppBtn" onclick="launchApp('stickynotes')">
+        <span class="startAppIcon">🗒️</span>
+        <span class="startAppLabel">Sticky Notes</span>
+      </button>
+      <button class="startAppBtn" onclick="launchApp('calculator')">
+        <span class="startAppIcon">🖩</span>
+        <span class="startAppLabel">Calculator</span>
+      </button>
+      <button class="startAppBtn" onclick="launchApp('paint')">
+        <span class="startAppIcon">🎨</span>
+        <span class="startAppLabel">Paint</span>
+      </button>
+      <button class="startAppBtn" onclick="launchApp('codeeditor')">
+        <span class="startAppIcon">💻</span>
+        <span class="startAppLabel">Code Editor</span>
+      </button>
+      <button class="startAppBtn" onclick="launchApp('markdown')">
+        <span class="startAppIcon">📄</span>
+        <span class="startAppLabel">Markdown</span>
+      </button>
+      <button class="startAppBtn" onclick="launchApp('tts')">
+        <span class="startAppIcon">🔊</span>
+        <span class="startAppLabel">Text to Speech</span>
+      </button>
+      <button class="startAppBtn" onclick="launchApp('clock')">
+        <span class="startAppIcon">🕐</span>
+        <span class="startAppLabel">Clock</span>
+      </button>
+      <button class="startAppBtn" onclick="launchApp('stopwatch')">
+        <span class="startAppIcon">⏱️</span>
+        <span class="startAppLabel">Stopwatch</span>
+      </button>
+      <button class="startAppBtn" onclick="launchApp('converter')">
+        <span class="startAppIcon">📐</span>
+        <span class="startAppLabel">Converter</span>
+      </button>
+      <button class="startAppBtn" onclick="launchApp('snake')">
+        <span class="startAppIcon">🐍</span>
+        <span class="startAppLabel">Snake</span>
+      </button>
+      <button class="startAppBtn" onclick="launchApp('tetris')">
+        <span class="startAppIcon">🧱</span>
+        <span class="startAppLabel">Tetris</span>
+      </button>
+      <button class="startAppBtn" onclick="launchApp('minesweeper')">
+        <span class="startAppIcon">💣</span>
+        <span class="startAppLabel">Minesweeper</span>
+      </button>
+      <button class="startAppBtn" onclick="launchApp('g2048')">
+        <span class="startAppIcon">🔢</span>
+        <span class="startAppLabel">2048</span>
+      </button>
+      <button class="startAppBtn" onclick="launchApp('pong')">
+        <span class="startAppIcon">🏓</span>
+        <span class="startAppLabel">Pong</span>
+      </button>
+      <button class="startAppBtn" onclick="launchApp('flappy')">
+        <span class="startAppIcon">🐦</span>
+        <span class="startAppLabel">Flappy Bird</span>
+      </button>
+      <button class="startAppBtn" onclick="launchApp('breakout')">
+        <span class="startAppIcon">🧨</span>
+        <span class="startAppLabel">Breakout</span>
+      </button>
+      <button class="startAppBtn" onclick="launchApp('wordle')">
+        <span class="startAppIcon">📟</span>
+        <span class="startAppLabel">Wordle</span>
+      </button>
+      <button class="startAppBtn" onclick="launchApp('memory')">
+        <span class="startAppIcon">🃏</span>
+        <span class="startAppLabel">Memory</span>
+      </button>
+      <button class="startAppBtn" onclick="launchApp('tictactoe')">
+        <span class="startAppIcon">❌</span>
+        <span class="startAppLabel">Tic-Tac-Toe</span>
+      </button>
+    </div>
+  </div>
+
   <!-- TASKBAR -->
   <div id="taskbar">
+    <div id="taskStart">
+      <button id="startBtn" title="Start">⊞</button>
+    </div>
     <div id="taskIcons">
-      <button id="browserTaskBtn">🌐 Browser</button>
+      <button class="taskBtn" id="browserTaskBtn" title="Browser">
+        <!-- Edge-style browser icon -->
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="edgeGrad1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#0078d4"/>
+              <stop offset="100%" stop-color="#1b8bed"/>
+            </linearGradient>
+            <linearGradient id="edgeGrad2" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#1dc0a6"/>
+              <stop offset="100%" stop-color="#0078d4"/>
+            </linearGradient>
+          </defs>
+          <!-- Main arc -->
+          <path d="M21 11.5C21 16.75 16.75 21 11.5 21C6.25 21 2 16.75 2 11.5C2 6.25 6.25 2 11.5 2C16.75 2 21 6.25 21 11.5Z" fill="url(#edgeGrad1)"/>
+          <!-- Inner wave / e-shape -->
+          <path d="M6 13.5C6 10.46 8.46 8 11.5 8C13.6 8 15.4 9.2 16.3 11H8.5C8.5 11 8 11.5 8 12.5C8 14.43 9.57 16 11.5 16C12.72 16 13.8 15.36 14.43 14.4L16.1 15.5C15.1 17.03 13.41 18 11.5 18C8.46 18 6 15.54 6 12.5V13.5Z" fill="white"/>
+        </svg>
+      </button>
     </div>
     <div id="systemTray">
+      <div id="clockDate"></div>
       <div id="clock"></div>
     </div>
   </div>
@@ -69,9 +195,10 @@
 
 </div>
 
-<!-- FIXED SCRIPT PATHS -->
+<!-- SCRIPTS -->
 <script src="browser.js"></script>
 <script src="os.js"></script>
+<script src="apps.js"></script>
 <script src="system.js"></script>
 
 </body>
