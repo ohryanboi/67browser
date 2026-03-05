@@ -1,0 +1,425 @@
+/* ===============================
+   67Labs OS - FULL UI STYLES
+   =============================== */
+
+body,html{
+  margin:0;
+  height:100%;
+  font-family:'Segoe UI',sans-serif;
+  overflow:hidden;
+}
+
+/* ===============================
+   BOOT SCREEN
+   =============================== */
+
+#bootScreen{
+  position:fixed;
+  inset:0;
+  background:black;
+  color:white;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+
+.boot-logo{
+  font-size:32px;
+  font-weight:600;
+}
+
+.spinner{
+  width:40px;
+  height:40px;
+  border:4px solid #555;
+  border-top:4px solid white;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+  margin:20px;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg);}
+}
+
+/* ===============================
+   DESKTOP
+   =============================== */
+
+#desktop{
+  width:100%;
+  height:100%;
+  background:url('https://wallpapercave.com/wp/wp8793653.jpg') center/cover no-repeat;
+  display:none;
+}
+
+/* ===============================
+   WINDOW
+   =============================== */
+
+.window{
+  width:900px;
+  height:600px;
+  background:white;
+  position:absolute;
+  top:50px;
+  left:100px;
+  border-radius:12px;
+  box-shadow:0 10px 40px rgba(0,0,0,.3);
+  display:flex;
+  flex-direction:column;
+  transition:all .3s cubic-bezier(.2,.8,.2,1);
+  overflow:hidden;
+}
+
+.window-header{
+  background:#f3f3f3;
+  display:flex;
+  justify-content:space-between;
+  padding:6px 10px;
+  cursor:move;
+  user-select:none;
+}
+
+.window-title{
+  font-weight:500;
+}
+
+.window-controls button{
+  background:none;
+  border:none;
+  font-size:16px;
+  margin-left:10px;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.window-controls button:hover{
+  background:#e0e0e0;
+  border-radius:6px;
+}
+
+/* ===============================
+   TAB BAR
+   =============================== */
+
+#tabBar{
+  display:flex;
+  align-items:center;
+  background:#eaeaea;
+  padding:5px;
+  overflow-x:auto;
+}
+
+.tab{
+  padding:6px 10px;
+  background:#ddd;
+  margin-right:5px;
+  border-radius:8px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  max-width:140px;
+  min-width:60px;
+  flex-shrink:0;
+  transition:.2s;
+}
+
+.tabTitle{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  min-width:0;
+  flex:1;
+}
+
+.tab:hover{
+  background:#ccc;
+}
+
+.tab.active{
+  background:white;
+  box-shadow:0 2px 5px rgba(0,0,0,.1);
+}
+
+.closeTab{
+  font-size:12px;
+  opacity:.6;
+  cursor:pointer;
+}
+
+.closeTab:hover{
+  opacity:1;
+}
+
+/* ===============================
+   BOOKMARKS
+   =============================== */
+
+#bookmarksBar{
+  display:flex;
+  padding:5px;
+  background:#f5f5f5;
+  overflow-x:auto;
+}
+
+.bookmark{
+  padding:4px 10px;
+  background:#eee;
+  margin-right:5px;
+  border-radius:6px;
+  cursor:pointer;
+  white-space:nowrap;
+  max-width:160px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  transition:.2s;
+}
+
+.bookmark:hover{
+  background:#ddd;
+}
+
+/* ===============================
+   ADDRESS BAR
+   =============================== */
+
+.address-bar{
+  display:flex;
+  padding:6px;
+  background:#f5f5f5;
+  gap:5px;
+}
+
+.address-bar button{
+  border:none;
+  background:white;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.address-bar button:hover{
+  background:#e0e0e0;
+}
+
+.address-bar button:disabled{
+  opacity:.35;
+  cursor:default;
+}
+
+.address-bar button:disabled:hover{
+  background:white;
+}
+
+#bookmarkBtn{
+  font-size:16px;
+  color:#f5a623;
+}
+
+.address-bar input{
+  flex:1;
+  padding:6px 10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  outline:none;
+}
+
+/* ===============================
+   HISTORY PANEL
+   =============================== */
+
+#historyPanel{
+  display:none;
+  position:absolute;
+  right:6px;
+  top:130px;
+  width:320px;
+  max-height:360px;
+  background:white;
+  border:1px solid #ddd;
+  border-radius:10px;
+  box-shadow:0 6px 24px rgba(0,0,0,.15);
+  overflow-y:auto;
+  z-index:200;
+  font-size:13px;
+}
+
+.history-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 12px;
+  font-weight:600;
+  border-bottom:1px solid #eee;
+  position:sticky;
+  top:0;
+  background:white;
+}
+
+.history-header button{
+  font-size:12px;
+  background:#f0f0f0;
+  border:none;
+  border-radius:6px;
+  padding:3px 8px;
+  cursor:pointer;
+}
+
+.history-header button:hover{
+  background:#e0e0e0;
+}
+
+.history-item{
+  padding:8px 12px;
+  cursor:pointer;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  color:#333;
+  transition:.15s;
+}
+
+.history-item:hover{
+  background:#f5f5f5;
+}
+
+.history-empty{
+  padding:16px 12px;
+  color:#999;
+  text-align:center;
+}
+
+/* ===============================
+   IFRAME
+   =============================== */
+
+iframe{
+  flex:1;
+  border:none;
+  background:white;
+}
+
+/* ===============================
+   TASKBAR
+   =============================== */
+
+#taskbar{
+  position:absolute;
+  bottom:0;
+  width:100%;
+  height:45px;
+  background:rgba(255,255,255,.8);
+  backdrop-filter:blur(12px);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 20px;
+  box-shadow:0 -2px 10px rgba(0,0,0,.1);
+}
+
+#taskIcons{
+  display:flex;
+  gap:6px;
+  align-items:center;
+}
+
+#browserTaskBtn{
+  background:rgba(255,255,255,.25);
+  border:none;
+  border-radius:8px;
+  padding:5px 12px;
+  font-size:13px;
+  cursor:pointer;
+  transition:.2s;
+}
+
+#browserTaskBtn:hover{
+  background:rgba(255,255,255,.45);
+}
+
+#systemTray{
+  display:flex;
+  gap:15px;
+  align-items:center;
+  font-size:14px;
+}
+
+
+/* ===============================
+   DOWNLOAD MANAGER
+   =============================== */
+
+.downloadItem{
+  position:fixed;
+  bottom:60px;
+  right:20px;
+  background:white;
+  padding:12px;
+  width:220px;
+  box-shadow:0 5px 20px rgba(0,0,0,.2);
+  border-radius:12px;
+  animation:fadeIn .3s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(10px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+.progressBar{
+  height:6px;
+  background:#ddd;
+  border-radius:6px;
+  margin-top:8px;
+}
+
+.progress{
+  height:100%;
+  width:0%;
+  background:#0078D7;
+  border-radius:6px;
+  transition:width .2s;
+}
+
+/* ===============================
+   DEVTOOLS PANEL
+   =============================== */
+
+.devtools{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  height:300px;
+  background:#1e1e1e;
+  color:white;
+  font-family:monospace;
+  display:flex;
+  flex-direction:column;
+  animation:slideUp .3s ease;
+}
+
+@keyframes slideUp{
+  from{transform:translateY(100%);}
+  to{transform:translateY(0);}
+}
+
+.devHeader{
+  background:#333;
+  padding:6px 12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:14px;
+}
+
+.devContent{
+  flex:1;
+  padding:10px;
+  overflow:auto;
+}

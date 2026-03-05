@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>67Labs OS</title>
+
+<!-- FIXED PATH -->
+<link rel="stylesheet" href="ui.css">
+</head>
+<body>
+
+<!-- BOOT SCREEN -->
+<div id="bootScreen">
+  <div class="boot-logo">67Labs</div>
+  <div class="spinner"></div>
+  <div class="boot-text">Starting 67Labs OS...</div>
+</div>
+
+<!-- DESKTOP -->
+<div id="desktop">
+
+  <!-- BROWSER WINDOW -->
+  <div id="browserWindow" class="window">
+    <div class="window-header">
+      <div class="window-title">Google</div>
+      <div class="window-controls">
+        <button id="minBtn">–</button>
+        <button id="maxBtn">⬜</button>
+        <button id="closeBtn">✕</button>
+      </div>
+    </div>
+
+    <!-- TAB BAR -->
+    <div id="tabBar">
+      <button id="newTabBtn">+</button>
+    </div>
+
+    <!-- BOOKMARKS BAR -->
+    <div id="bookmarksBar"></div>
+
+    <!-- ADDRESS BAR -->
+    <div class="address-bar">
+      <button id="backBtn" disabled>&#9664;</button>
+      <button id="fwdBtn" disabled>&#9654;</button>
+      <button id="homeBtn">🏠</button>
+      <button id="refreshBtn">⟳</button>
+      <input id="urlInput" placeholder="Search or enter URL">
+      <button id="bookmarkBtn" title="Bookmark this page">☆</button>
+      <button id="historyBtn" title="History">🕐</button>
+    </div>
+
+    <!-- HISTORY PANEL -->
+    <div id="historyPanel"></div>
+
+    <iframe id="browserFrame"></iframe>
+  </div>
+
+  <!-- TASKBAR -->
+  <div id="taskbar">
+    <div id="taskIcons">
+      <button id="browserTaskBtn">🌐 Browser</button>
+    </div>
+    <div id="systemTray">
+      <div id="clock"></div>
+    </div>
+  </div>
+
+
+</div>
+
+<!-- FIXED SCRIPT PATHS -->
+<script src="browser.js"></script>
+<script src="os.js"></script>
+<script src="system.js"></script>
+
+</body>
+</html>
