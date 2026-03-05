@@ -1,425 +1,1074 @@
-/* ===============================
-   67Labs OS - FULL UI STYLES
-   =============================== */
+/* ===================================================
+   67Labs OS — Windows 11 Style
+   =================================================== */
 
-body,html{
-  margin:0;
-  height:100%;
-  font-family:'Segoe UI',sans-serif;
-  overflow:hidden;
+*, *::before, *::after { box-sizing: border-box; }
+
+body, html {
+  margin: 0;
+  height: 100%;
+  font-family: 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
+  overflow: hidden;
+  font-size: 13px;
 }
 
-/* ===============================
+/* ===================================================
    BOOT SCREEN
-   =============================== */
+   =================================================== */
 
-#bootScreen{
-  position:fixed;
-  inset:0;
-  background:black;
-  color:white;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  z-index:9999;
+#bootScreen {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  gap: 24px;
 }
 
-.boot-logo{
-  font-size:32px;
-  font-weight:600;
+.boot-logo {
+  font-size: 36px;
+  font-weight: 300;
+  letter-spacing: 2px;
+  color: #fff;
 }
 
-.spinner{
-  width:40px;
-  height:40px;
-  border:4px solid #555;
-  border-top:4px solid white;
-  border-radius:50%;
-  animation:spin 1s linear infinite;
-  margin:20px;
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(255,255,255,.2);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
 }
 
-@keyframes spin{
-  to{transform:rotate(360deg);}
+.boot-text {
+  font-size: 13px;
+  color: rgba(255,255,255,.5);
+  letter-spacing: 1px;
 }
 
-/* ===============================
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===================================================
+   LOGIN / LOCK SCREEN
+   =================================================== */
+
+#loginScreen {
+  position: fixed;
+  inset: 0;
+  background: url('https://4kwallpapers.com/images/wallpapers/windows-11-stock-official-3840x2400-5630.jpg') center/cover no-repeat;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  z-index: 9998;
+  user-select: none;
+}
+
+#loginClock {
+  text-align: center;
+  color: #fff;
+  text-shadow: 0 1px 8px rgba(0,0,0,.4);
+}
+
+#loginTime {
+  font-size: 72px;
+  font-weight: 200;
+  letter-spacing: -2px;
+  line-height: 1;
+}
+
+#loginDate {
+  font-size: 18px;
+  font-weight: 300;
+  margin-top: 6px;
+  opacity: .9;
+}
+
+#loginCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  animation: fadeIn .4s ease;
+}
+
+#loginAvatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.18);
+  backdrop-filter: blur(8px);
+  border: 2px solid rgba(255,255,255,.35);
+  font-size: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#loginUsername {
+  font-size: 18px;
+  font-weight: 400;
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(0,0,0,.35);
+}
+
+#loginPasswordWrap {
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,.18);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,.35);
+  border-radius: 4px;
+  overflow: hidden;
+  width: 240px;
+  height: 36px;
+}
+
+#loginPassword {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  padding: 0 12px;
+}
+
+#loginPassword::placeholder { color: rgba(255,255,255,.6); }
+
+#loginSubmit {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border: none;
+  background: rgba(255,255,255,.25);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s;
+}
+
+#loginSubmit:hover { background: rgba(255,255,255,.4); }
+
+#loginHint {
+  font-size: 11px;
+  color: rgba(255,255,255,.55);
+}
+
+/* ===================================================
    DESKTOP
-   =============================== */
+   =================================================== */
 
-#desktop{
-  width:100%;
-  height:100%;
-  background:url('https://wallpapercave.com/wp/wp8793653.jpg') center/cover no-repeat;
-  display:none;
+#desktop {
+  width: 100%;
+  height: 100%;
+  background: url('https://thebroncwriter.online/wp-content/uploads/2025/11/67-kid.jpg') center/cover no-repeat;
+  display: none;
+  position: relative;
 }
 
-/* ===============================
-   WINDOW
-   =============================== */
+/* ===================================================
+   WINDOW — Windows 11 style
+   =================================================== */
 
-.window{
-  width:900px;
-  height:600px;
-  background:white;
-  position:absolute;
-  top:50px;
-  left:100px;
-  border-radius:12px;
-  box-shadow:0 10px 40px rgba(0,0,0,.3);
-  display:flex;
-  flex-direction:column;
-  transition:all .3s cubic-bezier(.2,.8,.2,1);
-  overflow:hidden;
+.window {
+  position: absolute;
+  top: 40px;
+  left: 80px;
+  width: 960px;
+  height: 620px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow:
+    0 2px 4px rgba(0,0,0,.06),
+    0 8px 16px rgba(0,0,0,.12),
+    0 32px 64px rgba(0,0,0,.16),
+    0 0 0 1px rgba(0,0,0,.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: box-shadow .2s, opacity .2s, transform .2s;
 }
 
-.window-header{
-  background:#f3f3f3;
-  display:flex;
-  justify-content:space-between;
-  padding:6px 10px;
-  cursor:move;
-  user-select:none;
+/* Title bar */
+.window-header {
+  height: 32px;
+  min-height: 32px;
+  background: #f3f3f3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 12px;
+  cursor: move;
+  user-select: none;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  flex-shrink: 0;
 }
 
-.window-title{
-  font-weight:500;
+.window-title-area {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
 }
 
-.window-controls button{
-  background:none;
-  border:none;
-  font-size:16px;
-  margin-left:10px;
-  cursor:pointer;
-  transition:.2s;
+.window-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 
-.window-controls button:hover{
-  background:#e0e0e0;
-  border-radius:6px;
+.window-title {
+  font-size: 12px;
+  font-weight: 400;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px;
 }
 
-/* ===============================
-   TAB BAR
-   =============================== */
-
-#tabBar{
-  display:flex;
-  align-items:center;
-  background:#eaeaea;
-  padding:5px;
-  overflow-x:auto;
+/* Win11 window control buttons */
+.window-controls {
+  display: flex;
+  height: 32px;
+  flex-shrink: 0;
 }
 
-.tab{
-  padding:6px 10px;
-  background:#ddd;
-  margin-right:5px;
-  border-radius:8px;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  gap:5px;
-  max-width:140px;
-  min-width:60px;
-  flex-shrink:0;
-  transition:.2s;
+.window-controls button {
+  width: 46px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 10px;
+  color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .1s;
+  position: relative;
+  padding: 0;
 }
 
-.tabTitle{
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  min-width:0;
-  flex:1;
+/* Minimize icon */
+#minBtn::after {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 1px;
+  background: currentColor;
 }
 
-.tab:hover{
-  background:#ccc;
+/* Maximize icon */
+#maxBtn::after {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 10px;
+  border: 1px solid currentColor;
+  border-radius: 1px;
 }
 
-.tab.active{
-  background:white;
-  box-shadow:0 2px 5px rgba(0,0,0,.1);
+/* Close icon */
+#closeBtn::before,
+#closeBtn::after {
+  content: '';
+  display: block;
+  position: absolute;
+  width: 10px;
+  height: 1px;
+  background: currentColor;
+}
+#closeBtn::before { transform: rotate(45deg); }
+#closeBtn::after  { transform: rotate(-45deg); }
+
+.window-controls button:hover { background: rgba(0,0,0,.059); }
+#closeBtn:hover { background: #c42b1c; color: #fff; }
+#closeBtn:active { background: rgba(196,43,28,.8); }
+
+/* ===================================================
+   ADDRESS BAR — Edge style
+   =================================================== */
+
+.address-bar {
+  height: 46px;
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 8px;
+  background: #f3f3f3;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  flex-shrink: 0;
 }
 
-.closeTab{
-  font-size:12px;
-  opacity:.6;
-  cursor:pointer;
+.address-bar > button {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .1s;
+  flex-shrink: 0;
 }
 
-.closeTab:hover{
-  opacity:1;
+.address-bar > button:hover { background: rgba(0,0,0,.059); }
+.address-bar > button:disabled { opacity: .35; cursor: default; }
+.address-bar > button:disabled:hover { background: transparent; }
+
+/* URL pill — the main address bar input area */
+.url-pill {
+  flex: 1;
+  height: 32px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.14);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 8px;
+  margin: 0 4px;
+  transition: border-color .15s, box-shadow .15s;
 }
 
-/* ===============================
-   BOOKMARKS
-   =============================== */
-
-#bookmarksBar{
-  display:flex;
-  padding:5px;
-  background:#f5f5f5;
-  overflow-x:auto;
+.url-pill:focus-within {
+  border-color: #0067c0;
+  box-shadow: 0 0 0 2px rgba(0,103,192,.2);
 }
 
-.bookmark{
-  padding:4px 10px;
-  background:#eee;
-  margin-right:5px;
-  border-radius:6px;
-  cursor:pointer;
-  white-space:nowrap;
-  max-width:160px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  transition:.2s;
+.url-icon {
+  color: #5f6368;
+  flex-shrink: 0;
 }
 
-.bookmark:hover{
-  background:#ddd;
+#urlInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  color: #1a1a1a;
+  min-width: 0;
 }
 
-/* ===============================
-   ADDRESS BAR
-   =============================== */
+#urlInput::placeholder { color: #999; }
 
-.address-bar{
-  display:flex;
-  padding:6px;
-  background:#f5f5f5;
-  gap:5px;
-}
-
-.address-bar button{
-  border:none;
-  background:white;
-  padding:6px 10px;
-  border-radius:6px;
-  cursor:pointer;
-  transition:.2s;
-}
-
-.address-bar button:hover{
-  background:#e0e0e0;
-}
-
-.address-bar button:disabled{
-  opacity:.35;
-  cursor:default;
-}
-
-.address-bar button:disabled:hover{
-  background:white;
-}
-
-#bookmarkBtn{
-  font-size:16px;
-  color:#f5a623;
-}
-
-.address-bar input{
-  flex:1;
-  padding:6px 10px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  outline:none;
-}
-
-/* ===============================
-   HISTORY PANEL
-   =============================== */
-
-#historyPanel{
-  display:none;
-  position:absolute;
-  right:6px;
-  top:130px;
-  width:320px;
-  max-height:360px;
-  background:white;
-  border:1px solid #ddd;
-  border-radius:10px;
-  box-shadow:0 6px 24px rgba(0,0,0,.15);
-  overflow-y:auto;
-  z-index:200;
-  font-size:13px;
-}
-
-.history-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:10px 12px;
-  font-weight:600;
-  border-bottom:1px solid #eee;
-  position:sticky;
-  top:0;
-  background:white;
-}
-
-.history-header button{
-  font-size:12px;
-  background:#f0f0f0;
-  border:none;
-  border-radius:6px;
-  padding:3px 8px;
-  cursor:pointer;
-}
-
-.history-header button:hover{
-  background:#e0e0e0;
-}
-
-.history-item{
-  padding:8px 12px;
-  cursor:pointer;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  color:#333;
-  transition:.15s;
-}
-
-.history-item:hover{
-  background:#f5f5f5;
-}
-
-.history-empty{
-  padding:16px 12px;
-  color:#999;
-  text-align:center;
-}
-
-/* ===============================
+/* ===================================================
    IFRAME
-   =============================== */
+   =================================================== */
 
-iframe{
-  flex:1;
-  border:none;
-  background:white;
+iframe {
+  flex: 1;
+  border: none;
+  width: 100%;
+  background: #fff;
+  min-height: 0;
 }
 
-/* ===============================
-   TASKBAR
-   =============================== */
+/* ===================================================
+   TASKBAR — Windows 11 style (centered icons)
+   =================================================== */
 
-#taskbar{
-  position:absolute;
-  bottom:0;
-  width:100%;
-  height:45px;
-  background:rgba(255,255,255,.8);
-  backdrop-filter:blur(12px);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:0 20px;
-  box-shadow:0 -2px 10px rgba(0,0,0,.1);
+#taskbar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background: rgba(243,243,243,.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid rgba(0,0,0,.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
 }
 
-#taskIcons{
-  display:flex;
-  gap:6px;
-  align-items:center;
+/* Start button — pinned left */
+#taskStart {
+  position: absolute;
+  left: 12px;
+  display: flex;
+  align-items: center;
 }
 
-#browserTaskBtn{
-  background:rgba(255,255,255,.25);
-  border:none;
-  border-radius:8px;
-  padding:5px 12px;
-  font-size:13px;
-  cursor:pointer;
-  transition:.2s;
+#startBtn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s;
+  color: #0067c0;
 }
 
-#browserTaskBtn:hover{
-  background:rgba(255,255,255,.45);
+#startBtn:hover { background: rgba(0,0,0,.059); }
+
+/* Centered app icons */
+#taskIcons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
-#systemTray{
-  display:flex;
-  gap:15px;
-  align-items:center;
-  font-size:14px;
+.taskBtn {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s;
+  position: relative;
 }
 
+.taskBtn:hover { background: rgba(0,0,0,.059); }
 
-/* ===============================
-   DOWNLOAD MANAGER
-   =============================== */
-
-.downloadItem{
-  position:fixed;
-  bottom:60px;
-  right:20px;
-  background:white;
-  padding:12px;
-  width:220px;
-  box-shadow:0 5px 20px rgba(0,0,0,.2);
-  border-radius:12px;
-  animation:fadeIn .3s ease;
+/* Active indicator dot */
+.taskBtn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background: #0067c0;
+  border-radius: 50%;
 }
 
-@keyframes fadeIn{
-  from{opacity:0; transform:translateY(10px);}
-  to{opacity:1; transform:translateY(0);}
+/* System tray — pinned right */
+#systemTray {
+  position: absolute;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 1px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: default;
+  line-height: 1.2;
+  transition: background .15s;
 }
 
-.progressBar{
-  height:6px;
-  background:#ddd;
-  border-radius:6px;
-  margin-top:8px;
+#systemTray:hover { background: rgba(0,0,0,.059); }
+
+#clock {
+  font-size: 12px;
+  font-weight: 400;
+  color: #1a1a1a;
 }
 
-.progress{
-  height:100%;
-  width:0%;
-  background:#0078D7;
-  border-radius:6px;
-  transition:width .2s;
+#clockDate {
+  font-size: 11px;
+  color: #444;
 }
 
-/* ===============================
-   DEVTOOLS PANEL
-   =============================== */
+/* ===================================================
+   WINDOW BODY (generic app content area)
+   =================================================== */
 
-.devtools{
-  position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  height:300px;
-  background:#1e1e1e;
-  color:white;
-  font-family:monospace;
-  display:flex;
-  flex-direction:column;
-  animation:slideUp .3s ease;
+.window-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+  background: #fff;
 }
 
-@keyframes slideUp{
-  from{transform:translateY(100%);}
-  to{transform:translateY(0);}
+/* App toolbar shared styles */
+.app-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  background: #f3f3f3;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  flex-shrink: 0;
+  flex-wrap: wrap;
 }
 
-.devHeader{
-  background:#333;
-  padding:6px 12px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  font-size:14px;
+.app-toolbar button {
+  padding: 3px 10px;
+  border: 1px solid rgba(0,0,0,.14);
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  transition: background .1s;
 }
 
-.devContent{
-  flex:1;
-  padding:10px;
-  overflow:auto;
+.app-toolbar button:hover { background: #e8e8e8; }
+.app-toolbar button.active-tool { background: #dde9f8; border-color: #0067c0; }
+
+.app-status {
+  font-size: 11px;
+  color: #888;
+  margin-left: auto;
+}
+
+/* Window control icons for app windows (same as browser) */
+.app-min::after {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 1px;
+  background: currentColor;
+}
+
+.app-max::after {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 10px;
+  border: 1px solid currentColor;
+  border-radius: 1px;
+}
+
+.app-close::before,
+.app-close::after {
+  content: '';
+  display: block;
+  position: absolute;
+  width: 10px;
+  height: 1px;
+  background: currentColor;
+}
+.app-close::before { transform: rotate(45deg); }
+.app-close::after  { transform: rotate(-45deg); }
+
+/* ===================================================
+   START MENU
+   =================================================== */
+
+#startMenu {
+  position: absolute;
+  bottom: 52px;
+  left: 8px;
+  width: 360px;
+  background: rgba(243,243,243,.92);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(0,0,0,.12);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.18);
+  z-index: 5000;
+  display: none;
+  flex-direction: column;
+  padding: 16px;
+  gap: 12px;
+  animation: fadeIn .15s ease;
+}
+
+#startMenuHeader {
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(0,0,0,.07);
+}
+
+#startAppsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+
+.startAppBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 6px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background .1s;
+}
+
+.startAppBtn:hover { background: rgba(0,0,0,.06); }
+
+.startAppIcon { font-size: 26px; line-height: 1; }
+
+.startAppLabel {
+  font-size: 11px;
+  font-family: inherit;
+  color: #1a1a1a;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* ===================================================
+   NOTEPAD APP
+   =================================================== */
+
+.notepad-area {
+  flex: 1;
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 12px 16px;
+  background: #fff;
+  color: #1a1a1a;
+  min-height: 0;
+}
+
+/* ===================================================
+   CALCULATOR APP
+   =================================================== */
+
+#calc { display: flex; flex-direction: column; height: 100%; background: #f3f3f3; }
+
+#calc-display {
+  background: #1a1a1a;
+  color: #fff;
+  padding: 12px 16px 8px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+#calc-expr { font-size: 12px; color: #888; min-height: 16px; }
+#calc-val  { font-size: 36px; font-weight: 300; line-height: 1.1; word-break: break-all; }
+
+#calc-modes {
+  display: flex;
+  border-bottom: 1px solid rgba(0,0,0,.1);
+  flex-shrink: 0;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 6px;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  border-bottom: 2px solid transparent;
+  transition: .15s;
+}
+.mode-btn.active { border-bottom-color: #0067c0; color: #0067c0; font-weight: 600; }
+.mode-btn:hover:not(.active) { background: rgba(0,0,0,.04); }
+
+#calc-btns { display: grid; grid-template-columns: repeat(4, 1fr); flex: 1; gap: 1px; background: rgba(0,0,0,.08); }
+#calc-sci-btns { display: grid; grid-template-columns: repeat(5, 1fr); flex-shrink: 0; gap: 1px; background: rgba(0,0,0,.08); }
+
+.calc-btn {
+  padding: 0;
+  border: none;
+  background: #f9f9f9;
+  font-size: 16px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.calc-btn:hover { background: #eee; }
+.calc-btn:active { background: #ddd; }
+.calc-btn.op  { background: #e8e8e8; font-weight: 500; }
+.calc-btn.eq  { background: #0067c0; color: #fff; font-size: 20px; }
+.calc-btn.eq:hover { background: #0058a8; }
+.calc-btn.fn  { background: #ececec; font-size: 13px; }
+.calc-btn.sci { font-size: 12px; }
+
+/* ===================================================
+   PAINT APP
+   =================================================== */
+
+.paint-wrap { display: flex; flex-direction: column; height: 100%; }
+.paint-toolbar { flex-shrink: 0; }
+
+#paint-canvas {
+  flex: 1;
+  cursor: crosshair;
+  display: block;
+  background: #fff;
+  width: 100%;
+  min-height: 0;
+}
+
+/* ===================================================
+   CODE EDITOR APP
+   =================================================== */
+
+.code-wrap { display: flex; flex-direction: column; height: 100%; }
+
+#code-area {
+  flex: 1;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 10px 14px;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  tab-size: 2;
+  min-height: 0;
+}
+
+#code-output {
+  height: 160px;
+  border-top: 2px solid #333;
+  flex-shrink: 0;
+  background: #141414;
+}
+
+#code-output iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+}
+
+/* ===================================================
+   MARKDOWN EDITOR
+   =================================================== */
+
+.md-wrap {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  gap: 0;
+}
+
+#md-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 12px;
+  background: #f8f8f8;
+  border-right: 1px solid rgba(0,0,0,.1);
+  min-width: 0;
+}
+
+#md-preview {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #1a1a1a;
+  min-width: 0;
+}
+
+#md-preview h1,#md-preview h2,#md-preview h3 { margin: .5em 0 .25em; }
+#md-preview code { background: #f0f0f0; padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+#md-preview pre  { background: #1e1e1e; color: #d4d4d4; padding: 10px; border-radius: 6px; overflow-x: auto; }
+#md-preview blockquote { border-left: 3px solid #0067c0; margin: 0; padding: 4px 12px; color: #555; }
+
+/* ===================================================
+   TEXT-TO-SPEECH APP
+   =================================================== */
+
+.tts-wrap { padding: 14px; display: flex; flex-direction: column; gap: 10px; height: 100%; }
+
+#tts-text {
+  flex: 1;
+  border: 1px solid rgba(0,0,0,.14);
+  border-radius: 6px;
+  outline: none;
+  resize: none;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 10px 12px;
+  min-height: 0;
+}
+
+.tts-controls { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+
+.tts-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.tts-row label { width: 60px; color: #555; }
+.tts-row select, .tts-row input[type=range] { flex: 1; }
+
+.tts-btns { display: flex; gap: 8px; }
+.tts-btns button {
+  flex: 1;
+  padding: 7px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background .1s;
+}
+
+#tts-speak { background: #0067c0; color: #fff; }
+#tts-speak:hover { background: #0058a8; }
+#tts-stop  { background: #f0f0f0; }
+#tts-stop:hover { background: #e0e0e0; }
+
+/* ===================================================
+   STICKY NOTES (desktop items, not a window)
+   =================================================== */
+
+.sticky-note {
+  position: absolute;
+  width: 180px;
+  min-height: 140px;
+  border-radius: 4px;
+  box-shadow: 2px 4px 12px rgba(0,0,0,.18);
+  display: flex;
+  flex-direction: column;
+  cursor: move;
+  user-select: none;
+  z-index: 50;
+  animation: fadeIn .2s ease;
+}
+
+.sticky-header {
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 6px;
+  border-radius: 4px 4px 0 0;
+  cursor: move;
+  flex-shrink: 0;
+}
+
+.sticky-del {
+  width: 18px;
+  height: 18px;
+  border: none;
+  background: rgba(0,0,0,.15);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(0,0,0,.5);
+  line-height: 1;
+  padding: 0;
+}
+.sticky-del:hover { background: rgba(0,0,0,.25); }
+
+.sticky-body {
+  flex: 1;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 6px 8px;
+  cursor: text;
+}
+
+/* ===================================================
+   CLOCK / ALARM
+   =================================================== */
+.clock-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; height:100%; background:#1a1a2e; color:#fff; padding:20px; }
+.clock-digital { font-size:56px; font-weight:200; letter-spacing:4px; font-family:'Consolas',monospace; color:#e0e0e0; }
+.clock-date    { font-size:14px; color:#888; letter-spacing:1px; }
+.clock-svg     { filter: drop-shadow(0 0 12px rgba(0,120,255,.3)); }
+.clock-alarm-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:center; }
+.clock-alarm-row input[type=time] { padding:5px 10px; border-radius:6px; border:1px solid #444; background:#2a2a3e; color:#fff; font-size:14px; font-family:inherit; }
+.clock-alarm-row button { padding:6px 14px; border-radius:6px; border:none; cursor:pointer; font-family:inherit; font-size:13px; background:#0067c0; color:#fff; }
+.clock-alarm-row button:hover { background:#0058a8; }
+#clock-alarm-status { font-size:12px; color:#888; margin-top:4px; }
+
+/* ===================================================
+   STOPWATCH / TIMER
+   =================================================== */
+.sw-wrap { display:flex; flex-direction:column; align-items:center; gap:0; height:100%; background:#fafafa; }
+.sw-tabs { display:flex; width:100%; border-bottom:1px solid rgba(0,0,0,.08); flex-shrink:0; }
+.sw-tab  { flex:1; padding:10px; border:none; background:transparent; cursor:pointer; font-family:inherit; font-size:13px; font-weight:500; border-bottom:2px solid transparent; }
+.sw-tab.active { border-bottom-color:#0067c0; color:#0067c0; }
+.sw-display { font-size:60px; font-weight:200; font-family:'Consolas',monospace; color:#1a1a1a; padding:28px 0 16px; letter-spacing:2px; }
+.sw-btns { display:flex; gap:10px; }
+.sw-btns button { padding:10px 28px; border-radius:24px; border:none; cursor:pointer; font-family:inherit; font-size:14px; font-weight:500; transition:background .15s; }
+#sw-start  { background:#0067c0; color:#fff; } #sw-start:hover { background:#0058a8; }
+#sw-reset  { background:#f0f0f0; }            #sw-reset:hover  { background:#e0e0e0; }
+#sw-lap    { background:#f0f0f0; }            #sw-lap:hover    { background:#e0e0e0; }
+#sw-laps   { width:100%; overflow-y:auto; flex:1; font-size:13px; padding:0 16px; }
+#sw-laps div { padding:6px 0; border-bottom:1px solid rgba(0,0,0,.06); display:flex; justify-content:space-between; }
+.timer-input-row { display:flex; gap:8px; align-items:center; padding:16px 0 8px; }
+.timer-input-row input { width:52px; text-align:center; font-size:22px; font-family:'Consolas',monospace; border:1px solid rgba(0,0,0,.15); border-radius:6px; padding:4px; }
+.timer-input-row span  { font-size:18px; color:#888; }
+
+/* ===================================================
+   UNIT CONVERTER
+   =================================================== */
+.conv-wrap { padding:16px; display:flex; flex-direction:column; gap:12px; height:100%; overflow-y:auto; }
+.conv-category { display:flex; gap:6px; flex-wrap:wrap; }
+.conv-category button { padding:5px 12px; border-radius:16px; border:1px solid rgba(0,0,0,.14); background:#fff; cursor:pointer; font-size:12px; font-family:inherit; }
+.conv-category button.active { background:#0067c0; color:#fff; border-color:#0067c0; }
+.conv-row { display:flex; gap:10px; align-items:center; }
+.conv-row input  { flex:1; padding:8px 10px; border:1px solid rgba(0,0,0,.15); border-radius:6px; font-size:15px; font-family:inherit; }
+.conv-row select { padding:8px; border:1px solid rgba(0,0,0,.15); border-radius:6px; font-size:13px; font-family:inherit; background:#fff; }
+.conv-swap { background:none; border:none; font-size:20px; cursor:pointer; padding:0 4px; }
+.conv-result { font-size:22px; font-weight:300; color:#0067c0; text-align:center; padding:8px 0; }
+
+/* ===================================================
+   GAME CANVAS WRAPPER (shared by Snake, Tetris, Pong, Flappy, Breakout)
+   =================================================== */
+.game-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; background:#111; gap:0; position:relative; }
+.game-hud  { display:flex; gap:24px; align-items:center; padding:6px 16px; background:#1a1a1a; width:100%; font-size:13px; color:#ccc; flex-shrink:0; }
+.game-hud span { font-weight:600; color:#fff; }
+.game-canvas { display:block; image-rendering:pixelated; }
+.game-overlay { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; background:rgba(0,0,0,.72); color:#fff; z-index:10; }
+.game-overlay h2 { font-size:28px; font-weight:300; margin:0; }
+.game-overlay p  { font-size:14px; color:#aaa; margin:0; }
+.game-overlay button { padding:10px 28px; border-radius:20px; border:none; background:#0067c0; color:#fff; font-size:14px; cursor:pointer; font-family:inherit; }
+.game-overlay button:hover { background:#0058a8; }
+
+/* ===================================================
+   MINESWEEPER
+   =================================================== */
+.ms-wrap { display:flex; flex-direction:column; align-items:center; height:100%; background:#c0c0c0; gap:0; }
+.ms-toolbar { display:flex; align-items:center; gap:10px; padding:8px 12px; background:#c0c0c0; border-bottom:2px solid #808080; width:100%; flex-shrink:0; justify-content:center; }
+.ms-toolbar select, .ms-toolbar button { font-family:inherit; font-size:13px; padding:3px 8px; border:2px solid; border-color:#fff #808080 #808080 #fff; background:#c0c0c0; cursor:pointer; }
+.ms-info { font-size:14px; font-weight:700; font-family:'Consolas',monospace; background:#000; color:red; padding:2px 6px; border:2px inset #808080; min-width:40px; text-align:center; }
+#ms-board { display:grid; gap:1px; padding:8px; flex-shrink:0; }
+.ms-cell { width:28px; height:28px; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; cursor:pointer; border:2px solid; border-color:#fff #808080 #808080 #fff; background:#c0c0c0; user-select:none; font-family:'Consolas',monospace; }
+.ms-cell.revealed  { border-style:inset; border-color:#808080; background:#bdbdbd; cursor:default; }
+.ms-cell.flagged   { font-size:14px; }
+.ms-cell.mine-hit  { background:#f44336; }
+.ms-num-1{color:#0000ff}.ms-num-2{color:#008000}.ms-num-3{color:#ff0000}.ms-num-4{color:#00008b}
+.ms-num-5{color:#8b0000}.ms-num-6{color:#008b8b}.ms-num-7{color:#000}.ms-num-8{color:#808080}
+
+/* ===================================================
+   2048
+   =================================================== */
+.g2048-wrap { display:flex; flex-direction:column; align-items:center; gap:10px; padding:16px; height:100%; background:#faf8ef; }
+.g2048-header { display:flex; gap:16px; align-items:center; }
+.g2048-score-box { background:#bbada0; color:#f9f6f2; border-radius:6px; padding:4px 14px; text-align:center; }
+.g2048-score-box .label { font-size:10px; font-weight:700; letter-spacing:1px; }
+.g2048-score-box .val   { font-size:20px; font-weight:700; }
+.g2048-new { padding:8px 16px; background:#8f7a66; color:#f9f6f2; border:none; border-radius:6px; cursor:pointer; font-family:inherit; font-size:13px; font-weight:700; }
+#g2048-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; background:#bbada0; border-radius:8px; padding:8px; }
+.g2048-cell { width:72px; height:72px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:700; background:#cdc1b4; color:#776e65; font-family:inherit; transition:background .1s; }
+.g2048-cell[data-v="2"]    { background:#eee4da; }
+.g2048-cell[data-v="4"]    { background:#ede0c8; }
+.g2048-cell[data-v="8"]    { background:#f2b179; color:#f9f6f2; }
+.g2048-cell[data-v="16"]   { background:#f59563; color:#f9f6f2; font-size:18px; }
+.g2048-cell[data-v="32"]   { background:#f67c5f; color:#f9f6f2; font-size:18px; }
+.g2048-cell[data-v="64"]   { background:#f65e3b; color:#f9f6f2; font-size:18px; }
+.g2048-cell[data-v="128"]  { background:#edcf72; color:#f9f6f2; font-size:16px; }
+.g2048-cell[data-v="256"]  { background:#edcc61; color:#f9f6f2; font-size:16px; }
+.g2048-cell[data-v="512"]  { background:#edc850; color:#f9f6f2; font-size:16px; }
+.g2048-cell[data-v="1024"] { background:#edc53f; color:#f9f6f2; font-size:13px; }
+.g2048-cell[data-v="2048"] { background:#edc22e; color:#f9f6f2; font-size:13px; }
+
+/* ===================================================
+   WORDLE
+   =================================================== */
+.wordle-wrap { display:flex; flex-direction:column; align-items:center; gap:12px; padding:16px; height:100%; background:#fff; overflow-y:auto; }
+#wordle-grid { display:grid; grid-template-columns:repeat(5,52px); gap:5px; justify-content:center; }
+.wordle-tile { width:52px; height:52px; border:2px solid #d3d6da; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:700; text-transform:uppercase; transition:background .3s, border-color .3s, color .3s; }
+.wordle-tile.correct  { background:#6aaa64; border-color:#6aaa64; color:#fff; }
+.wordle-tile.present  { background:#c9b458; border-color:#c9b458; color:#fff; }
+.wordle-tile.absent   { background:#787c7e; border-color:#787c7e; color:#fff; }
+.wordle-tile.filled   { border-color:#878a8c; }
+#wordle-keyboard { display:flex; flex-direction:column; gap:5px; align-items:center; }
+.wordle-kb-row   { display:flex; gap:4px; }
+.wordle-key { min-width:36px; height:56px; border:none; border-radius:4px; background:#d3d6da; font-family:inherit; font-weight:700; font-size:13px; cursor:pointer; padding:0 6px; }
+.wordle-key.correct { background:#6aaa64; color:#fff; }
+.wordle-key.present { background:#c9b458; color:#fff; }
+.wordle-key.absent  { background:#787c7e; color:#fff; }
+#wordle-msg { font-size:14px; font-weight:600; color:#333; min-height:20px; }
+
+/* ===================================================
+   MEMORY CARD GAME
+   =================================================== */
+.mem-wrap { display:flex; flex-direction:column; align-items:center; gap:12px; padding:16px; height:100%; background:#f0f4ff; overflow-y:auto; }
+.mem-hud  { display:flex; gap:20px; font-size:14px; font-weight:600; color:#333; }
+#mem-board { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+.mem-card { width:80px; height:80px; border-radius:8px; cursor:pointer; perspective:600px; position:relative; }
+.mem-card-inner { width:100%; height:100%; position:relative; transform-style:preserve-3d; transition:transform .35s; }
+.mem-card.flipped .mem-card-inner, .mem-card.matched .mem-card-inner { transform:rotateY(180deg); }
+.mem-front, .mem-back { position:absolute; inset:0; border-radius:8px; display:flex; align-items:center; justify-content:center; backface-visibility:hidden; }
+.mem-front { background:#4a90d9; color:#fff; font-size:28px; transform:rotateY(180deg); }
+.mem-back  { background:#c5d5ea; font-size:28px; color:#6a8db8; user-select:none; }
+.mem-card.matched .mem-front { background:#6aaa64; }
+.mem-hud button { padding:5px 14px; border:none; border-radius:12px; background:#0067c0; color:#fff; font-family:inherit; font-size:12px; cursor:pointer; }
+
+/* ===================================================
+   TIC-TAC-TOE
+   =================================================== */
+.ttt-wrap { display:flex; flex-direction:column; align-items:center; gap:14px; padding:20px; height:100%; background:#fafafa; }
+.ttt-hud  { display:flex; align-items:center; gap:16px; font-size:15px; font-weight:600; color:#333; }
+.ttt-hud button { padding:6px 16px; border:none; border-radius:14px; background:#0067c0; color:#fff; font-family:inherit; font-size:13px; cursor:pointer; }
+.ttt-mode { font-size:13px; color:#555; }
+#ttt-status { font-size:15px; font-weight:600; color:#333; min-height:22px; }
+#ttt-board { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; }
+.ttt-cell { width:90px; height:90px; display:flex; align-items:center; justify-content:center; font-size:42px; font-weight:700; background:#fff; border:2px solid #e0e0e0; border-radius:8px; cursor:pointer; transition:background .1s; }
+.ttt-cell:hover:empty { background:#f0f0f0; }
+.ttt-cell.X { color:#e53935; }
+.ttt-cell.O { color:#1e88e5; }
+.ttt-cell.win { background:#e8f5e9; }
+.ttt-mode-row { display:flex; gap:8px; }
+.ttt-mode-row button { padding:6px 16px; border-radius:14px; border:1px solid #ccc; background:#fff; cursor:pointer; font-family:inherit; font-size:13px; }
+.ttt-mode-row button.active { background:#0067c0; color:#fff; border-color:#0067c0; }
+.ttt-scores { display:flex; gap:20px; font-size:13px; color:#555; }
+.ttt-new { padding:7px 20px; border:none; border-radius:14px; background:#0067c0; color:#fff; cursor:pointer; font-family:inherit; }
+
+/* ===================================================
+   ANIMATIONS
+   =================================================== */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-8px); }
+  40%      { transform: translateX(8px); }
+  60%      { transform: translateX(-6px); }
+  80%      { transform: translateX(6px); }
 }
