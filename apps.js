@@ -2534,21 +2534,6 @@ APPS.email = function() {
       </div>
     `;
     createAppWindow("email", "Email Client", "✉️", body, 700, 500);
-}; {
-    const body = `
-      <div style="display:flex; height:100%;">
-        <textarea id="mdInput" style="flex:1; padding:12px; border:none; border-right:1px solid #ccc; font-family:monospace; font-size:12px;" placeholder="# Heading\\n\\nEnter markdown..."></textarea>
-        <div id="mdPreview" style="flex:1; padding:12px; border-left:1px solid #ccc; overflow-y:auto; background:#f9f9f9;"></div>
-      </div>
-    `;
-    createAppWindow("markdown2", "Markdown Previewer", "📄", body, 900, 500);
-    document.getElementById("mdInput").addEventListener("input", () => {
-        const md = document.getElementById("mdInput").value;
-        document.getElementById("mdPreview").innerHTML = md.replace(/# (.*)/g, "<h2>$1</h2>")
-                                                           .replace(/## (.*)/g, "<h3>$1</h3>")
-                                                           .replace(/\\*\\*(.*?)\\*\\*/g, "<b>$1</b>")
-                                                           .replace(/\\*(.*?)\\*/g, "<i>$1</i>");
-    });
 };
 
 APPS.sudoku = function() {
