@@ -120,6 +120,7 @@
       </div>
       <div class="start-footer-actions">
         <button id="trayThemeToggle" class="start-footer-btn" type="button">Theme</button>
+        <button id="openUpdatesBtn" class="start-footer-btn" type="button">What's New</button>
         <button id="lockShellBtn" class="start-footer-btn" type="button">Lock</button>
       </div>
     </div>
@@ -157,6 +158,21 @@
     <div class="cheat-hint">Hint: try the classic up-up-down-down sequence.</div>
   </aside>
 
+  <!-- WHAT'S NEW / UPDATE WINDOW -->
+  <aside id="updateWindow" aria-hidden="true">
+    <div class="panel-head">
+      <div>
+        <h3>What's New</h3>
+        <p>Recent updates you can show to users</p>
+      </div>
+      <button id="closeUpdateBtn" class="shell-link-btn" type="button">Close</button>
+    </div>
+    <div id="updateWindowBody"></div>
+    <div class="update-actions">
+      <button id="dismissUpdateBtn" class="start-footer-btn" type="button">Got it</button>
+    </div>
+  </aside>
+
   <!-- TASKBAR -->
   <div id="taskbar">
     <div id="taskbarCenter">
@@ -186,6 +202,7 @@
 
 <!-- SCRIPTS -->
 <script src="browser.js"></script>
+  <script src="updates.js"></script>
 <script src="os.js"></script>
 <script src="apps.js"></script>
 <script src="system.js"></script>
