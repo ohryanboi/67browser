@@ -4,7 +4,8 @@ const SHELL_KEYS = {
     theme: "67labs_theme",
     wallpaper: "67labs_wallpaper",
     wallpaperCustom: "67labs_wallpaper_custom",
-    notifications: "67labs_notifications"
+    notifications: "67labs_notifications",
+    seenUpdateVersion: "67labs_seen_update_version"
 };
 
 const KONAMI = [
@@ -112,6 +113,8 @@ const shell = {
     startOpen: false,
     trayOpen: false,
     cheatOpen: false,
+    updateOpen: false,
+    updateShownThisSession: false,
     konamiBuffer: []
 };
 
@@ -144,6 +147,8 @@ function cacheRefs() {
     shell.refs.notificationPanel = document.getElementById("notificationPanel");
     shell.refs.notificationList = document.getElementById("notificationList");
     shell.refs.cheatMenu = document.getElementById("cheatMenu");
+    shell.refs.updateWindow = document.getElementById("updateWindow");
+    shell.refs.updateWindowBody = document.getElementById("updateWindowBody");
     shell.refs.snapPreview = document.getElementById("snapPreview");
     shell.refs.startBtn = document.getElementById("startBtn");
     shell.refs.systemTray = document.getElementById("systemTray");
@@ -209,6 +214,9 @@ function bindShellEvents() {
     document.getElementById("pinHintBtn").onclick = () => notify("Pin apps", "Use the small pin button on any app tile to pin or unpin it from the taskbar.");
     document.getElementById("clearNotificationsBtn").onclick = clearNotifications;
     document.getElementById("closeCheatBtn").onclick = () => toggleCheatMenu(false);
+    document.getElementById("openUpdatesBtn").onclick = () => toggleUpdateWindow(true);
+    document.getElementById("closeUpdateBtn").onclick = () => toggleUpdateWindow(false);
+    document.getElementById("dismissUpdateBtn").onclick = () => toggleUpdateWindow(false);
 
     shell.refs.startAppsGrid.addEventListener("click", handleStartGridClick);
     shell.refs.startAppsGrid.addEventListener("keydown", handleStartGridKeydown);
@@ -229,6 +237,9 @@ function bindShellEvents() {
         if (shell.cheatOpen && !shell.refs.cheatMenu.contains(event.target)) {
             toggleCheatMenu(false);
         }
+        if (shell.updateOpen && !shell.refs.updateWindow.contains(event.target) && !document.getElementById("openUpdatesBtn").contains(event.target)) {
+            toggleUpdateWindow(false);
+        }
     });
 
     document.addEventListener("keydown", handleGlobalShortcuts);
@@ -239,6 +250,7 @@ function handleGlobalShortcuts(event) {
         toggleStartMenu(false);
         toggleNotificationPanel(false);
         toggleCheatMenu(false);
+        toggleUpdateWindow(false);
         return;
     }
 
@@ -290,6 +302,7 @@ function doLogin() {
         shell.refs.desktop.style.opacity = "1";
         notify("Welcome back", "Your Windows-11-inspired shell is ready.");
         renderTaskbar();
+        maybeShowUpdateWindow();
     }, 300);
 }
 
@@ -426,6 +439,54 @@ function toggleCheatMenu(force = !shell.cheatOpen) {
     shell.refs.cheatMenu.setAttribute("aria-hidden", String(!shell.cheatOpen));
 }
 window.toggleCheatMenu = toggleCheatMenu;
+
+function toggleUpdateWindow(force = !shell.updateOpen) {
+    if (!shell.refs.updateWindow) return;
+    if (force) renderUpdateWindow();
+    shell.updateOpen = force;
+    shell.refs.updateWindow.classList.toggle("open", shell.updateOpen);
+    shell.refs.updateWindow.setAttribute("aria-hidden", String(!shell.updateOpen));
+    if (shell.updateOpen) {
+        toggleStartMenu(false);
+        toggleNotificationPanel(false);
+        toggleCheatMenu(false);
+    }
+}
+window.toggleUpdateWindow = toggleUpdateWindow;
+
+function renderUpdateWindow() {
+    if (!shell.refs.updateWindowBody) return;
+    const updates = Array.isArray(window.SHELL_UPDATES) ? window.SHELL_UPDATES : [];
+    if (!updates.length) {
+        shell.refs.updateWindowBody.innerHTML = `<div class="update-entry"><div class="update-entry-summary">No update notes are available yet.</div></div>`;
+        return;
+    }
+
+    shell.refs.updateWindowBody.innerHTML = updates.map((item, index) => `
+      <article class="update-entry ${index === 0 ? "latest" : ""}">
+        <div class="update-entry-head">
+          <div>
+            <h4>${item.title}</h4>
+            <div class="update-entry-summary">${item.summary}</div>
+          </div>
+          <div class="update-badge-group">
+            <span class="update-badge">v${item.version}</span>
+            <span class="update-date">${item.date}</span>
+          </div>
+        </div>
+        <ul class="update-list">${(item.changes || []).map(change => `<li>${change}</li>`).join("")}</ul>
+      </article>`).join("");
+}
+
+function maybeShowUpdateWindow() {
+    if (shell.updateShownThisSession) return;
+    const updates = Array.isArray(window.SHELL_UPDATES) ? window.SHELL_UPDATES : [];
+    if (!updates.length) return;
+
+    shell.updateShownThisSession = true;
+    saveValue(SHELL_KEYS.seenUpdateVersion, updates[0].version);
+    setTimeout(() => toggleUpdateWindow(true), 220);
+}
 
 function notify(title, message) {
     const entry = {
@@ -888,64 +949,3 @@ function handleWallpaperUpload(event) {
     const file = event.target.files && event.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => {
-        shell.customWallpaper = reader.result;
-        saveValue(SHELL_KEYS.wallpaperCustom, shell.customWallpaper);
-        applyWallpaper(shell.wallpaper, shell.customWallpaper);
-        notify("Custom wallpaper", `${file.name} applied to the desktop.`);
-    };
-    reader.readAsDataURL(file);
-}
-window.handleWallpaperUpload = handleWallpaperUpload;
-
-function resetShellData() {
-    localStorage.removeItem(SHELL_KEYS.pins);
-    localStorage.removeItem(SHELL_KEYS.recent);
-    localStorage.removeItem(SHELL_KEYS.theme);
-    localStorage.removeItem(SHELL_KEYS.wallpaper);
-    localStorage.removeItem(SHELL_KEYS.wallpaperCustom);
-    localStorage.removeItem(SHELL_KEYS.notifications);
-    shell.pins = [...DEFAULT_PINS];
-    shell.recent = [];
-    shell.notifications = [];
-    shell.theme = prefersDark() ? "dark" : "light";
-    shell.wallpaper = "aurora";
-    shell.customWallpaper = "";
-    applyTheme(shell.theme, false);
-    applyWallpaper(shell.wallpaper, shell.customWallpaper);
-    renderTaskbar();
-    renderStartMenu();
-    renderNotifications();
-}
-window.resetShellData = resetShellData;
-
-function loadArray(key, fallback) {
-    try {
-        const value = JSON.parse(localStorage.getItem(key));
-        return Array.isArray(value) ? value : fallback;
-    } catch (_) {
-        return fallback;
-    }
-}
-
-function loadValue(key, fallback) {
-    try {
-        return localStorage.getItem(key) ?? fallback;
-    } catch (_) {
-        return fallback;
-    }
-}
-
-function saveValue(key, value) {
-    try {
-        localStorage.setItem(key, typeof value === "string" ? value : JSON.stringify(value));
-    } catch (_) {}
-}
-
-function unique(items) {
-    return [...new Set(items.filter(Boolean))];
-}
-
-function prefersDark() {
-    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-}
