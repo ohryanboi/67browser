@@ -433,17 +433,7 @@ function codeFormat() {
 // ──────────────────────────────────────────────────────
 // MARKDOWN EDITOR
 // ──────────────────────────────────────────────────────
-APPS.markdown = function () {
-    // Load marked.js from CDN if not already loaded
-    if (!window.marked) {
-        const s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
-        s.onload = () => openMarkdownApp();
-        document.head.appendChild(s);
-    } else {
-        openMarkdownApp();
-    }
-};
+APPS.markdown = function () { openMarkdownApp(); };
 
 function openMarkdownApp() {
     const body = `
@@ -475,8 +465,29 @@ function mdUpdate() {
     const txt = input.value;
     const words = txt.trim() ? txt.trim().split(/\s+/).length : 0;
     if (status) status.textContent = words + ' word' + (words !== 1 ? 's' : '');
-    if (window.marked) preview.innerHTML = window.marked.parse(txt);
+    preview.innerHTML = simpleMarkdownToHtml(txt);
     try { localStorage.setItem('67labs_markdown', txt); } catch (_) {}
+}
+
+function simpleMarkdownToHtml(txt) {
+    const escaped = txt
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+    return escaped
+        .replace(/^### (.*)$/gm, '<h3>$1</h3>')
+        .replace(/^## (.*)$/gm, '<h2>$1</h2>')
+        .replace(/^# (.*)$/gm, '<h1>$1</h1>')
+        .replace(/^> (.*)$/gm, '<blockquote>$1</blockquote>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/^- (.*)$/gm, '<li>$1</li>')
+        .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
+        .replace(/\n{2,}/g, '</p><p>')
+        .replace(/^(?!<h1|<h2|<h3|<blockquote|<ul)(.+)$/gm, '<p>$1</p>')
+        .replace(/<p><\/p>/g, '');
 }
 
 function mdCopy() {
@@ -1853,4 +1864,869 @@ function tttRender(){
         cell.onclick=()=>tttMove(i);
         board.appendChild(cell);
     });
+}
+
+// ═══════════════════════════════════════════════════════
+// 16. SETTINGS APP
+// ═══════════════════════════════════════════════════════
+APPS.settings = function() {
+    const body = `
+      <div class="settings-shell">
+        <div class="shell-card">
+          <h3>Personalization</h3>
+          <p>Switch themes and customize the wallpaper used by the desktop and lock screen.</p>
+          <div class="shell-stack">
+            <button class="shell-pill-btn" onclick="setTheme('light')">Light</button>
+            <button class="shell-pill-btn" onclick="setTheme('dark')">Dark</button>
+            <button class="shell-pill-btn" onclick="toggleTheme()">Toggle</button>
+          </div>
+        </div>
+        <div class="settings-grid">
+          <div class="shell-card">
+            <h4>Wallpaper presets</h4>
+            <div class="shell-stack">
+              <button class="shell-pill-btn" onclick="setWallpaperPreset('aurora')">Aurora</button>
+              <button class="shell-pill-btn" onclick="setWallpaperPreset('sunrise')">Sunrise</button>
+              <button class="shell-pill-btn" onclick="setWallpaperPreset('dusk')">Dusk</button>
+              <button class="shell-pill-btn" onclick="setWallpaperPreset('matrix')">Matrix</button>
+            </div>
+          </div>
+          <div class="shell-card">
+            <h4>Custom wallpaper</h4>
+            <p>Upload a local image. It stays in localStorage so the shell remains embeddable and self-contained.</p>
+            <label class="shell-pill-btn wallpaper-upload">Choose image<input type="file" accept="image/*" onchange="handleWallpaperUpload(event)"></label>
+          </div>
+          <div class="shell-card">
+            <h4>Shell storage</h4>
+            <p>localStorage usage: <b id="storageUsage">0 KB</b></p>
+            <div class="shell-stack">
+              <button class="shell-pill-btn" onclick="clearAllData()">Factory reset shell</button>
+            </div>
+          </div>
+          <div class="shell-card">
+            <h4>About this UI</h4>
+            <p>Original front-end shell inspired by modern desktop UX. No external assets, logos, or frameworks required.</p>
+          </div>
+        </div>
+      </div>
+    `;
+    createAppWindow("settings", "Settings", "⚙️", body, 760, 560);
+    updateStorageDisplay();
+};
+
+// ═══════════════════════════════════════════════════════
+// 17. FILE MANAGER
+// ═══════════════════════════════════════════════════════
+APPS.filemanager = function() {
+    const body = `
+      <div class="explorer-shell">
+        <div class="explorer-layout">
+          <aside class="explorer-sidebar">
+            <div class="explorer-nav-item active">Quick access</div>
+            <div class="explorer-nav-item">Desktop</div>
+            <div class="explorer-nav-item">Documents</div>
+            <div class="explorer-nav-item">Pictures</div>
+            <div class="explorer-nav-item">Storage</div>
+          </aside>
+          <section class="explorer-main">
+            <div class="explorer-toolbar">
+              <button class="shell-pill-btn" onclick="fileNavUp()">Up</button>
+              <div class="explorer-breadcrumbs" id="filePath">Home / User / Documents</div>
+            </div>
+            <div id="fileList" class="explorer-grid"></div>
+          </section>
+        </div>
+      </div>
+    `;
+    createAppWindow("filemanager", "File Manager", "📁", body, 840, 560);
+    renderFileList();
+};
+
+// ═══════════════════════════════════════════════════════
+// 18. SYSTEM MONITOR
+// ═══════════════════════════════════════════════════════
+APPS.monitor = function() {
+    const body = `
+      <div style="padding:16px; display:flex; flex-direction:column; gap:16px; height:100%; overflow-y:auto;">
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <div style="font-weight:bold; margin-bottom:8px;">CPU Usage</div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="flex:1; height:20px; background:#f0f0f0; border-radius:4px; overflow:hidden;">
+              <div id="cpuBar" style="height:100%; width:45%; background:#0067c0; transition:width 0.5s;"></div>
+            </div>
+            <span id="cpuPercent" style="min-width:50px;">45%</span>
+          </div>
+        </div>
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <div style="font-weight:bold; margin-bottom:8px;">Memory Usage</div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="flex:1; height:20px; background:#f0f0f0; border-radius:4px; overflow:hidden;">
+              <div id="memBar" style="height:100%; width:62%; background:#e53935; transition:width 0.5s;"></div>
+            </div>
+            <span id="memPercent" style="min-width:50px;">62%</span>
+          </div>
+        </div>
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <div style="font-weight:bold; margin-bottom:8px;">Disk Usage</div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="flex:1; height:20px; background:#f0f0f0; border-radius:4px; overflow:hidden;">
+              <div id="diskBar" style="height:100%; width:78%; background:#f0ad4e; transition:width 0.5s;"></div>
+            </div>
+            <span id="diskPercent" style="min-width:50px;">78%</span>
+          </div>
+        </div>
+      </div>
+    `;
+    createAppWindow("monitor", "System Monitor", "📊", body, 480, 320);
+    setInterval(() => {
+        const cpu = Math.random() * 100 | 0;
+        const mem = Math.random() * 100 | 0;
+        const disk = Math.random() * 100 | 0;
+        document.getElementById("cpuBar").style.width = cpu + "%";
+        document.getElementById("cpuPercent").textContent = cpu + "%";
+        document.getElementById("memBar").style.width = mem + "%";
+        document.getElementById("memPercent").textContent = mem + "%";
+        document.getElementById("diskBar").style.width = disk + "%";
+        document.getElementById("diskPercent").textContent = disk + "%";
+    }, 2000);
+};
+
+// ═══════════════════════════════════════════════════════
+// 19. TASK MANAGER
+// ═══════════════════════════════════════════════════════
+APPS.taskmanager = function() {
+    const body = `
+      <div style="padding:16px; display:flex; flex-direction:column; gap:12px; height:100%; overflow-y:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <tr style="border-bottom:1px solid #ddd; font-weight:bold;">
+            <th style="padding:8px; text-align:left;">App Name</th>
+            <th style="padding:8px; text-align:left;">Memory</th>
+            <th style="padding:8px; text-align:center;">Status</th>
+          </tr>
+          <tr style="border-bottom:1px solid #eee;">
+            <td style="padding:8px;">Browser</td>
+            <td style="padding:8px;">156 MB</td>
+            <td style="padding:8px; text-align:center;"><span style="color:green;">●</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid #eee;">
+            <td style="padding:8px;">Paint</td>
+            <td style="padding:8px;">89 MB</td>
+            <td style="padding:8px; text-align:center;"><span style="color:green;">●</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid #eee;">
+            <td style="padding:8px;">Calculator</td>
+            <td style="padding:8px;">12 MB</td>
+            <td style="padding:8px; text-align:center;"><span style="color:green;">●</span></td>
+          </tr>
+        </table>
+        <button onclick="alert('Process ended')" style="padding:8px 12px; background:#dc3545; color:#fff; border:none; border-radius:4px; cursor:pointer; align-self:flex-start;">End Task</button>
+      </div>
+    `;
+    createAppWindow("taskmanager", "Task Manager", "⚡", body, 600, 400);
+};
+
+// ═══════════════════════════════════════════════════════
+// 20. TERMINAL / COMMAND LINE
+// ═══════════════════════════════════════════════════════
+APPS.terminal = function() {
+    const body = `
+      <div style="display:flex; height:100%; flex-direction:column; background:#000; color:#0f0; font-family:monospace; font-size:12px;">
+        <div id="termOutput" style="flex:1; overflow-y:auto; padding:12px; white-space:pre-wrap; word-wrap:break-word;"></div>
+        <div style="border-top:1px solid #333; padding:8px; display:flex;">
+          <span style="color:#0f0;">C:\\> </span>
+          <input type="text" id="termInput" placeholder="" style="flex:1; background:#000; color:#0f0; border:none; outline:none; font-family:monospace; font-size:12px;">
+        </div>
+      </div>
+    `;
+    createAppWindow("terminal", "Terminal", "⌨️", body, 700, 450);
+    document.getElementById("termInput").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            const cmd = e.target.value;
+            const output = document.getElementById("termOutput");
+            output.textContent += "C:\\> " + cmd + "\n";
+            const responses = {
+                "help": "dir, echo, time, date, calc, notepad, ver",
+                "time": new Date().toLocaleTimeString(),
+                "date": new Date().toLocaleDateString(),
+                "ver": "67Labs OS v1.0",
+                "echo": cmd.split(" ").slice(1).join(" "),
+                "dir": "Documents  Downloads  Pictures  Videos",
+                "clear": "",
+            };
+            const response = responses[cmd.split(" ")[0]] || "Unknown command. Type 'help' for commands.";
+            if (cmd === "clear") output.textContent = "";
+            else output.textContent += response + "\n";
+            e.target.value = "";
+        }
+    });
+};
+
+// ═══════════════════════════════════════════════════════
+// 21. SCREENSHOT TOOL
+// ═══════════════════════════════════════════════════════
+APPS.screenshot = function() {
+    const body = `
+      <div style="padding:16px; display:flex; flex-direction:column; gap:12px; height:100%;">
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <h3 style="margin:0 0 8px 0;">Screenshot Tool</h3>
+          <p style="margin:0; font-size:12px; color:#666;">Capture your screen or a specific region</p>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button onclick="captureFullScreen()" style="flex:1; padding:8px 12px; background:#0067c0; color:#fff; border:none; border-radius:4px; cursor:pointer;">📸 Full Screen</button>
+          <button onclick="captureRegion()" style="flex:1; padding:8px 12px; background:#0067c0; color:#fff; border:none; border-radius:4px; cursor:pointer;">✂️ Region</button>
+        </div>
+        <div id="screenshotPreview" style="flex:1; border:1px solid #ddd; border-radius:6px; overflow:hidden; background:#f9f9f9; display:flex; align-items:center; justify-content:center;">
+          <span style="color:#999;">Screenshot preview</span>
+        </div>
+      </div>
+    `;
+    createAppWindow("screenshot", "Screenshot", "📸", body, 480, 420);
+};
+
+function captureFullScreen() {
+    alert("📸 Screenshot saved to clipboard!");
+}
+
+function captureRegion() {
+    alert("✂️ Select the region to capture");
+}
+
+// ═══════════════════════════════════════════════════════
+// 22. SCREEN RECORDER
+// ═══════════════════════════════════════════════════════
+APPS.recorder = function() {
+    const body = `
+      <div style="padding:16px; display:flex; flex-direction:column; gap:12px; height:100%; align-items:center; justify-content:center;">
+        <div style="font-size:48px;">🎥</div>
+        <h3>Screen Recorder</h3>
+        <div style="display:flex; gap:8px;">
+          <button onclick="startRecording()" style="padding:8px 12px; background:#0067c0; color:#fff; border:none; border-radius:4px; cursor:pointer;">● Start</button>
+          <button onclick="stopRecording()" style="padding:8px 12px; background:#dc3545; color:#fff; border:none; border-radius:4px; cursor:pointer;">⏹ Stop</button>
+        </div>
+        <p style="font-size:12px; color:#666;">Duration: <b id="recDuration">00:00</b></p>
+      </div>
+    `;
+    createAppWindow("recorder", "Screen Recorder", "🎥", body, 360, 300);
+};
+
+function startRecording() { alert("🎥 Recording started..."); }
+function stopRecording() { alert("✅ Recording saved as video!"); }
+
+// ═══════════════════════════════════════════════════════
+// 23. DISK SPACE VISUALIZER
+// ═══════════════════════════════════════════════════════
+APPS.diskspace = function() {
+    const body = `
+      <div style="padding:16px; display:flex; flex-direction:column; gap:16px; height:100%;">
+        <div style="display:flex; gap:16px; align-items:center;">
+          <div style="width:120px; height:120px; border-radius:50%; background:conic-gradient(#0067c0 0deg 180deg, #e53935 180deg 252deg, #f0ad4e 252deg 360deg); display:flex; align-items:center; justify-content:center;">
+            <div style="width:100px; height:100px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; text-align:center;">
+              <b>68%<br>Used</b>
+            </div>
+          </div>
+          <div style="flex:1;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+              <span style="font-weight:bold;">Apps</span><span>32 GB</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+              <span style="font-weight:bold;">Media</span><span>18 GB</span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span style="font-weight:bold;">Other</span><span>15 GB</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    createAppWindow("diskspace", "Disk Space", "💾", body, 500, 280);
+};
+
+// ═══════════════════════════════════════════════════════
+// 24. NETWORK MONITOR
+// ═══════════════════════════════════════════════════════
+APPS.network = function() {
+    const body = `
+      <div style="padding:16px; display:flex; flex-direction:column; gap:16px; height:100%; overflow-y:auto;">
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <div style="font-weight:bold; margin-bottom:8px;">🔼 Upload</div>
+          <div style="font-size:14px;"><b id="uploadSpeed">2.4</b> Mbps</div>
+        </div>
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <div style="font-weight:bold; margin-bottom:8px;">🔽 Download</div>
+          <div style="font-size:14px;"><b id="downloadSpeed">15.8</b> Mbps</div>
+        </div>
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <div style="font-weight:bold; margin-bottom:8px;">📡 Proxy Requests</div>
+          <div id="proxyCount" style="font-size:14px;"><b>0</b> / 10,000 used</div>
+        </div>
+        <table style="width:100%; border-collapse:collapse; font-size:11px; margin-top:12px;">
+          <tr style="border-bottom:1px solid #ddd; font-weight:bold;">
+            <th style="padding:6px; text-align:left;">URL</th>
+            <th style="padding:6px; text-align:left;">Status</th>
+          </tr>
+          <tr style="border-bottom:1px solid #eee;">
+            <td style="padding:6px;">google.com</td>
+            <td style="padding:6px;"><span style="color:green;">✓ 200</span></td>
+          </tr>
+        </table>
+      </div>
+    `;
+    createAppWindow("network", "Network Monitor", "📡", body, 500, 380);
+    setInterval(() => {
+        document.getElementById("uploadSpeed").textContent = (Math.random() * 5).toFixed(1);
+        document.getElementById("downloadSpeed").textContent = (Math.random() * 30 + 5).toFixed(1);
+    }, 1000);
+};
+
+// ═══════════════════════════════════════════════════════
+// 25. DEVICE MANAGER
+// ═══════════════════════════════════════════════════════
+APPS.devicemgr = function() {
+    const body = `
+      <div style="padding:16px; display:flex; flex-direction:column; gap:12px; height:100%; overflow-y:auto;">
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <b>Processor</b><br><span style="font-size:12px;">Intel Core i7-11700K @ 3.60GHz</span>
+        </div>
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <b>Cores</b><br><span style="font-size:12px;">8 Cores / 16 Threads</span>
+        </div>
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <b>RAM</b><br><span style="font-size:12px;">32 GB (DDR4)</span>
+        </div>
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <b>Storage</b><br><span style="font-size:12px;">1 TB NVMe SSD</span>
+        </div>
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <b>Display</b><br><span style="font-size:12px;">1920x1080 @ 60Hz</span>
+        </div>
+      </div>
+    `;
+    createAppWindow("devicemgr", "Device Manager", "🖥️", body, 420, 380);
+};
+
+// ═══════════════════════════════════════════════════════
+// 26. EVENT VIEWER
+// ═══════════════════════════════════════════════════════
+APPS.eventviewer = function() {
+    const body = `
+      <div style="display:flex; height:100%; flex-direction:column;">
+        <div style="padding:8px; background:#f0f0f0; border-bottom:1px solid #ccc; display:flex; gap:8px;">
+          <button style="padding:6px 12px; cursor:pointer;">✓ Clear</button>
+          <button style="padding:6px 12px; cursor:pointer;">🔄 Refresh</button>
+        </div>
+        <table style="width:100%; border-collapse:collapse; font-size:11px;">
+          <tr style="border-bottom:1px solid #ddd; font-weight:bold; background:#f0f0f0;">
+            <th style="padding:6px; text-align:left;">Time</th>
+            <th style="padding:6px; text-align:left;">Event</th>
+            <th style="padding:6px; text-align:left;">Type</th>
+          </tr>
+          <tr style="border-bottom:1px solid #eee;">
+            <td style="padding:6px;">10:35:22</td>
+            <td style="padding:6px;">Browser launched</td>
+            <td style="padding:6px;"><span style="color:#0067c0;">ℹ️ Info</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid #eee;">
+            <td style="padding:6px;">10:30:15</td>
+            <td style="padding:6px;">Paint window created</td>
+            <td style="padding:6px;"><span style="color:#0067c0;">ℹ️ Info</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid #eee;">
+            <td style="padding:6px;">10:25:43</td>
+            <td style="padding:6px;">System boot completed</td>
+            <td style="padding:6px;"><span style="color:#28a745;">✓ Success</span></td>
+          </tr>
+        </table>
+      </div>
+    `;
+    createAppWindow("eventviewer", "Event Viewer", "📋", body, 600, 350);
+};
+
+// ═══════════════════════════════════════════════════════
+// 27. REGISTRY EDITOR
+// ═══════════════════════════════════════════════════════
+APPS.regedit = function() {
+    const body = `
+      <div style="display:flex; height:100%;">
+        <div style="width:30%; border-right:1px solid #ccc; padding:8px; overflow-y:auto; font-size:12px;">
+          <div style="cursor:pointer; padding:4px; background:#0067c0; color:#fff; border-radius:3px; margin-bottom:4px;">🔑 HKEY_LOCAL_MACHINE</div>
+          <div style="cursor:pointer; padding:4px; margin-bottom:4px;">📁 Software</div>
+          <div style="cursor:pointer; padding:4px; margin-bottom:4px;">📁 System</div>
+        </div>
+        <div style="flex:1; padding:8px; overflow-y:auto; font-family:monospace; font-size:11px;">
+          <table style="width:100%; border-collapse:collapse;">
+            <tr style="border-bottom:1px solid #ddd; font-weight:bold;">
+              <th style="padding:6px; text-align:left;">Name</th>
+              <th style="padding:6px; text-align:left;">Type</th>
+              <th style="padding:6px; text-align:left;">Value</th>
+            </tr>
+            <tr style="border-bottom:1px solid #eee;">
+              <td style="padding:6px;">Version</td>
+              <td style="padding:6px;">REG_SZ</td>
+              <td style="padding:6px;">1.0</td>
+            </tr>
+            <tr style="border-bottom:1px solid #eee;">
+              <td style="padding:6px;">BuildNumber</td>
+              <td style="padding:6px;">REG_DWORD</td>
+              <td style="padding:6px;">22621</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    `;
+    createAppWindow("regedit", "Registry Editor", "🔧", body, 700, 420);
+};
+
+// ═══════════════════════════════════════════════════════
+// 28. SERVICES MANAGER
+// ═══════════════════════════════════════════════════════
+APPS.services = function() {
+    const body = `
+      <table style="width:100%; border-collapse:collapse; font-size:12px;">
+        <tr style="border-bottom:1px solid #ddd; font-weight:bold; background:#f0f0f0;">
+          <th style="padding:8px; text-align:left;">Service Name</th>
+          <th style="padding:8px; text-align:center;">Status</th>
+          <th style="padding:8px; text-align:center;">Startup</th>
+        </tr>
+        <tr style="border-bottom:1px solid #eee;">
+          <td style="padding:8px;">Background Tasks</td>
+          <td style="padding:8px; text-align:center;"><span style="color:green;">▶ Running</span></td>
+          <td style="padding:8px; text-align:center;">Auto</td>
+        </tr>
+        <tr style="border-bottom:1px solid #eee;">
+          <td style="padding:8px;">Network Service</td>
+          <td style="padding:8px; text-align:center;"><span style="color:green;">▶ Running</span></td>
+          <td style="padding:8px; text-align:center;">Auto</td>
+        </tr>
+        <tr style="border-bottom:1px solid #eee;">
+          <td style="padding:8px;">Update Service</td>
+          <td style="padding:8px; text-align:center;"><span style="color:gray;">⏸ Stopped</span></td>
+          <td style="padding:8px; text-align:center;">Manual</td>
+        </tr>
+      </table>
+    `;
+    createAppWindow("services", "Services", "⚙️", body, 600, 320);
+};
+
+// ═══════════════════════════════════════════════════════
+// 29. BOOT SETTINGS
+// ═══════════════════════════════════════════════════════
+APPS.bootsettings = function() {
+    const body = `
+      <div style="padding:16px; display:flex; flex-direction:column; gap:12px; height:100%; overflow-y:auto;">
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <label style="display:flex; align-items:center; gap:8px;">
+            <input type="checkbox" checked> Enable Boot Animation
+          </label>
+        </div>
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <label>Boot Duration (ms):<br>
+          <input type="number" value="2500" min="500" max="5000" style="width:100%; padding:6px; margin-top:4px; border:1px solid #ccc; border-radius:4px;"></label>
+        </div>
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <label style="display:flex; align-items:center; gap:8px;">
+            <input type="checkbox" checked> Play Startup Sound
+          </label>
+        </div>
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <label>Boot Logo Text:<br>
+          <input type="text" value="67Labs" style="width:100%; padding:6px; margin-top:4px; border:1px solid #ccc; border-radius:4px;"></label>
+        </div>
+      </div>
+    `;
+    createAppWindow("bootsettings", "Boot Settings", "🚀", body, 420, 360);
+};
+
+// ═══════════════════════════════════════════════════════
+// 30. THEME EDITOR
+// ═══════════════════════════════════════════════════════
+APPS.themeeditor = function() {
+    const body = `
+      <div style="padding:16px; display:flex; flex-direction:column; gap:12px; height:100%; overflow-y:auto;">
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <label>Primary Color:<br>
+          <input type="color" value="#0067c0" style="width:100%; height:40px; margin-top:4px; cursor:pointer;"></label>
+        </div>
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <label>Accent Color:<br>
+          <input type="color" value="#e53935" style="width:100%; height:40px; margin-top:4px; cursor:pointer;"></label>
+        </div>
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <label>Background Color:<br>
+          <input type="color" value="#ffffff" style="width:100%; height:40px; margin-top:4px; cursor:pointer;"></label>
+        </div>
+        <button style="padding:8px 12px; background:#0067c0; color:#fff; border:none; border-radius:4px; cursor:pointer;">💾 Save Theme</button>
+      </div>
+    `;
+    createAppWindow("themeeditor", "Theme Editor", "🎨", body, 380, 400);
+};
+
+// ═══════════════════════════════════════════════════════
+// 31. SHORTCUT MANAGER
+// ═══════════════════════════════════════════════════════
+APPS.shortcuts = function() {
+    const body = `
+      <div style="padding:16px; display:flex; flex-direction:column; gap:12px; height:100%; overflow-y:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <tr style="border-bottom:1px solid #ddd; font-weight:bold;">
+            <th style="padding:8px; text-align:left;">Action</th>
+            <th style="padding:8px; text-align:left;">Hotkey</th>
+          </tr>
+          <tr style="border-bottom:1px solid #eee;">
+            <td style="padding:8px;">Open Start Menu</td>
+            <td style="padding:8px;"><kbd>Win</kbd></td>
+          </tr>
+          <tr style="border-bottom:1px solid #eee;">
+            <td style="padding:8px;">Task Manager</td>
+            <td style="padding:8px;"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Esc</kbd></td>
+          </tr>
+          <tr style="border-bottom:1px solid #eee;">
+            <td style="padding:8px;">Screenshot</td>
+            <td style="padding:8px;"><kbd>Print Screen</kbd></td>
+          </tr>
+        </table>
+      </div>
+    `;
+    createAppWindow("shortcuts", "Shortcut Manager", "⌨️", body, 480, 320);
+};
+
+// ═══════════════════════════════════════════════════════
+// 32. STARTUP APPS
+// ═══════════════════════════════════════════════════════
+APPS.startupapps = function() {
+    const body = `
+      <div style="padding:16px; display:flex; flex-direction:column; gap:12px; height:100%; overflow-y:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <tr style="border-bottom:1px solid #ddd; font-weight:bold;">
+            <th style="padding:8px; text-align:left;">App</th>
+            <th style="padding:8px; text-align:center;">Enabled</th>
+          </tr>
+          <tr style="border-bottom:1px solid #eee;">
+            <td style="padding:8px;">Browser</td>
+            <td style="padding:8px; text-align:center;"><input type="checkbox" checked></td>
+          </tr>
+          <tr style="border-bottom:1px solid #eee;">
+            <td style="padding:8px;">Terminal</td>
+            <td style="padding:8px; text-align:center;"><input type="checkbox"></td>
+          </tr>
+        </table>
+      </div>
+    `;
+    createAppWindow("startupapps", "Startup Apps", "🚀", body, 420, 300);
+};
+
+// ═══════════════════════════════════════════════════════
+// 33. ABOUT OS
+// ═══════════════════════════════════════════════════════
+APPS.about = function() {
+    const body = `
+      <div style="padding:24px; display:flex; flex-direction:column; align-items:center; gap:16px; text-align:center;">
+        <div style="font-size:64px;">67Labs</div>
+        <h2 style="margin:0;">67Labs OS</h2>
+        <p style="margin:0; font-size:14px; color:#666;">Version 1.0.0<br>Windows 11 Inspired OS Simulator</p>
+        <div style="border-top:1px solid #ddd; padding-top:16px; width:100%;">
+          <p style="margin:0; font-size:12px;">© 2025 67Labs<br>All Rights Reserved<br><br><i>🎉 Welcome to the future of web-based operating systems!</i></p>
+        </div>
+        <button onclick="showEasterEgg()" style="margin-top:8px; padding:6px 12px; background:#0067c0; color:#fff; border:none; border-radius:4px; cursor:pointer; font-size:12px;">🥚 Secret</button>
+      </div>
+    `;
+    createAppWindow("about", "About 67Labs OS", "ℹ️", body, 400, 400);
+};
+
+function showEasterEgg() {
+    if (window.toggleCheatMenu) window.toggleCheatMenu(true);
+}
+
+// ═══════════════════════════════════════════════════════
+// 34. DISK CLEANUP
+// ═══════════════════════════════════════════════════════
+APPS.cleanup = function() {
+    const body = `
+      <div style="padding:16px; display:flex; flex-direction:column; gap:12px; height:100%; overflow-y:auto;">
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <label style="display:flex; align-items:center; gap:8px;">
+            <input type="checkbox" checked> Temporary Files (245 MB)
+          </label>
+        </div>
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <label style="display:flex; align-items:center; gap:8px;">
+            <input type="checkbox" checked> Cache (512 MB)
+          </label>
+        </div>
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <label style="display:flex; align-items:center; gap:8px;">
+            <input type="checkbox"> localStorage Data (128 MB)
+          </label>
+        </div>
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px; background:#fff3cd;">
+          <p style="margin:0; font-size:12px;">⚠️ <b>Total to clean:</b> 757 MB</p>
+        </div>
+        <button onclick="performCleanup()" style="padding:8px 12px; background:#28a745; color:#fff; border:none; border-radius:4px; cursor:pointer;">🧹 Clean Now</button>
+      </div>
+    `;
+    createAppWindow("cleanup", "Disk Cleanup", "🧹", body, 420, 340);
+};
+
+function performCleanup() { alert("✅ Cleanup completed! Freed 757 MB"); }
+
+// ═══════════════════════════════════════════════════════
+// 35. SYSTEM SOUNDS
+// ═══════════════════════════════════════════════════════
+APPS.sounds = function() {
+    const body = `
+      <div style="padding:16px; display:flex; flex-direction:column; gap:12px; height:100%; overflow-y:auto;">
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <label style="display:flex; align-items:center; gap:8px;">
+            <input type="checkbox" checked> Window Open/Close
+          </label>
+        </div>
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <label style="display:flex; align-items:center; gap:8px;">
+            <input type="checkbox" checked> Notification
+          </label>
+        </div>
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <label style="display:flex; align-items:center; gap:8px;">
+            <input type="checkbox" checked> Error Alert
+          </label>
+        </div>
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px;">
+          <label style="display:flex; align-items:center; gap:8px;">
+            <input type="checkbox" checked> Startup Sound
+          </label>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:8px;">
+          <button onclick="testSound()" style="flex:1; padding:8px 12px; background:#0067c0; color:#fff; border:none; border-radius:4px; cursor:pointer;">🔊 Test</button>
+          <button onclick="saveAudioSettings()" style="flex:1; padding:8px 12px; background:#28a745; color:#fff; border:none; border-radius:4px; cursor:pointer;">💾 Save</button>
+        </div>
+      </div>
+    `;
+    createAppWindow("sounds", "System Sounds", "🔊", body, 400, 360);
+};
+
+function testSound() { alert("🔊 Test sound playing..."); }
+function saveAudioSettings() { alert("✅ Sound settings saved"); }
+
+// ═══════════════════════════════════════════════════════
+// 39. EMAIL CLIENT
+// ═══════════════════════════════════════════════════════
+APPS.email = function() {
+    const body = `
+      <div style="display:flex; height:100%;">
+        <div style="width:40%; border-right:1px solid #ccc; display:flex; flex-direction:column;">
+          <div style="padding:8px; background:#f0f0f0; border-bottom:1px solid #ccc;">
+            <button style="width:100%; padding:8px; background:#0067c0; color:#fff; border:none; border-radius:4px; cursor:pointer;">✉️ New</button>
+          </div>
+          <div style="flex:1; overflow-y:auto; font-size:12px;">
+            <div style="padding:8px; background:#e8f4f8; border-bottom:1px solid #ddd; cursor:pointer;">
+              <b>Inbox</b> (3)
+            </div>
+            <div style="padding:8px; border-bottom:1px solid #eee; cursor:pointer;">📤 Sent</div>
+            <div style="padding:8px; border-bottom:1px solid #eee; cursor:pointer;">🗑️ Trash</div>
+          </div>
+        </div>
+        <div style="flex:1; padding:12px; overflow-y:auto;">
+          <div style="border-bottom:1px solid #ddd; padding-bottom:8px; margin-bottom:8px;">
+            <b>Welcome to 67Labs Email</b><br>
+            <span style="font-size:12px; color:#666;">from: system@67labs.local</span>
+          </div>
+          <p style="font-size:12px;">Thank you for using 67Labs OS!</p>
+        </div>
+      </div>
+    `;
+    createAppWindow("email", "Email Client", "✉️", body, 700, 500);
+}; {
+    const body = `
+      <div style="display:flex; height:100%;">
+        <textarea id="mdInput" style="flex:1; padding:12px; border:none; border-right:1px solid #ccc; font-family:monospace; font-size:12px;" placeholder="# Heading\\n\\nEnter markdown..."></textarea>
+        <div id="mdPreview" style="flex:1; padding:12px; border-left:1px solid #ccc; overflow-y:auto; background:#f9f9f9;"></div>
+      </div>
+    `;
+    createAppWindow("markdown2", "Markdown Previewer", "📄", body, 900, 500);
+    document.getElementById("mdInput").addEventListener("input", () => {
+        const md = document.getElementById("mdInput").value;
+        document.getElementById("mdPreview").innerHTML = md.replace(/# (.*)/g, "<h2>$1</h2>")
+                                                           .replace(/## (.*)/g, "<h3>$1</h3>")
+                                                           .replace(/\\*\\*(.*?)\\*\\*/g, "<b>$1</b>")
+                                                           .replace(/\\*(.*?)\\*/g, "<i>$1</i>");
+    });
+};
+
+APPS.sudoku = function() {
+    const body = `
+      <div style="padding:12px;">
+        <div style="display:grid; grid-template-columns:repeat(9, 30px); gap:2px; margin-bottom:12px;">
+          ${Array(81).fill().map((_, i) => `<input type="text" maxlength="1" style="width:30px; height:30px; text-align:center; border:${[2,5,8].includes(i%9)?'2':'1'}px solid #000; font-weight:bold;">`).join('')}
+        </div>
+        <button style="padding:8px 12px; background:#0067c0; color:#fff; border:none; border-radius:4px; cursor:pointer;">Solve</button>
+        <button style="padding:8px 12px; background:#6c757d; color:#fff; border:none; border-radius:4px; cursor:pointer; margin-left:4px;">Clear</button>
+      </div>
+    `;
+    createAppWindow("sudoku", "Sudoku", "🎯", body, 400, 500);
+};
+
+APPS.crossword = function() {
+    const body = `
+      <div style="padding:12px; display:flex; height:100%; gap:12px;">
+        <div style="flex:1;">
+          <div style="display:grid; grid-template-columns:repeat(8, 25px); gap:2px;">
+            ${Array(64).fill().map((_, i) => `<div style="width:25px; height:25px; border:1px solid #000; ${i%3===0?'background:#333':'background:#fff'};"></div>`).join('')}
+          </div>
+        </div>
+        <div style="width:200px; overflow-y:auto; font-size:12px;">
+          <div style="font-weight:bold; margin-bottom:8px;">Across</div>
+          <div style="margin-bottom:2px;">1. Large feline (3)</div>
+          <div style="margin-bottom:8px;">2. Canine (3)</div>
+          <div style="font-weight:bold; margin-bottom:8px;">Down</div>
+          <div style="margin-bottom:2px;">1. Flying mammal (3)</div>
+        </div>
+      </div>
+    `;
+    createAppWindow("crossword", "Crossword", "🔤", body, 600, 420);
+};
+
+APPS.chess = function() {
+    const body = `
+      <div style="padding:12px; display:flex; flex-direction:column; align-items:center; gap:12px; height:100%;">
+        <div style="display:grid; grid-template-columns:repeat(8, 40px); gap:1px; background:#999;">
+          ${Array(64).fill().map((_, i) => `<div style="width:40px; height:40px; background:${(i+Math.floor(i/8))%2===0?'#f0d9b5':'#b58863'}; display:flex; align-items:center; justify-content:center; font-size:20px; cursor:pointer;">${i===0?'♖':i===1?'♘':i===2?'♗':''}${i>=48&&i<56?'♟':''}</div>`).join('')}
+        </div>
+        <button style="padding:8px 12px; background:#0067c0; color:#fff; border:none; border-radius:4px; cursor:pointer;">New Game</button>
+      </div>
+    `;
+    createAppWindow("chess", "Chess", "♟", body, 420, 500);
+};
+
+APPS.checkers = function() {
+    const body = `
+      <div style="padding:12px; display:flex; flex-direction:column; align-items:center; gap:12px; height:100%;">
+        <div style="display:grid; grid-template-columns:repeat(8, 40px); gap:1px;">
+          ${Array(64).fill().map((_, i) => `<div style="width:40px; height:40px; background:${(i+Math.floor(i/8))%2===0?'#ddd':'#666'}; display:flex; align-items:center; justify-content:center; cursor:pointer;">${(i+Math.floor(i/8))%2===1&&i<16?'●':''}</div>`).join('')}
+        </div>
+      </div>
+    `;
+    createAppWindow("checkers", "Checkers", "⚫", body, 420, 480);
+};
+
+APPS.connect4 = function() {
+    const body = `
+      <div style="padding:12px; display:flex; flex-direction:column; align-items:center; gap:12px; height:100%;">
+        <div style="display:grid; grid-template-columns:repeat(7, 40px); gap:2px;">
+          ${Array(42).fill().map((_, i) => `<div onclick="dropToken(${i%7})" style="width:40px; height:40px; background:#4169e1; border-radius:50%; cursor:pointer; border:2px solid #1e40af;"></div>`).join('')}
+        </div>
+        <button style="padding:8px 12px; background:#0067c0; color:#fff; border:none; border-radius:4px; cursor:pointer;">Restart</button>
+      </div>
+    `;
+    createAppWindow("connect4", "Connect Four", "🔴", body, 400, 420);
+};
+
+function dropToken(col) { alert("Token dropped in column " + (col+1)); }
+
+APPS.hangman = function() {
+    const body = `
+      <div style="padding:16px; display:flex; flex-direction:column; align-items:center; gap:12px; height:100%;">
+        <div style="font-size:48px; font-weight:bold;">_ _ _ _ _</div>
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px; width:100%;">
+          <div style="font-size:12px; color:#666; margin-bottom:8px;">Guessed Letters:</div>
+          <div>A E I O U T</div>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:4px; width:100%;">
+          ${['A','B','C','D','E','F'].map(l => `<button style="padding:4px 8px; font-size:12px; cursor:pointer; border:1px solid #ccc; border-radius:3px;">${l}</button>`).join('')}
+        </div>
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px; background:#fff3cd; width:100%; text-align:center;">
+          <div style="font-size:12px; color:#666;">Wrong Guesses</div>
+          <div style="font-weight:bold; font-size:18px;">3 / 6</div>
+        </div>
+      </div>
+    `;
+    createAppWindow("hangman", "Hangman", "🎮", body, 420, 420);
+};
+
+APPS.trivia = function() {
+    const body = `
+      <div style="padding:16px; display:flex; flex-direction:column; gap:12px; height:100%; overflow-y:auto;">
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px; background:#f0f0f0;">
+          <div style="font-weight:bold;">Question 1 of 10</div>
+          <div style="margin-top:8px; font-size:14px;">What is the capital of France?</div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <button style="padding:8px 12px; border:1px solid #ccc; border-radius:4px; cursor:pointer; text-align:left;">A) London</button>
+          <button style="padding:8px 12px; border:2px solid #0067c0; border-radius:4px; cursor:pointer; text-align:left; background:#e8f4f8;">B) Paris</button>
+          <button style="padding:8px 12px; border:1px solid #ccc; border-radius:4px; cursor:pointer; text-align:left;">C) Berlin</button>
+          <button style="padding:8px 12px; border:1px solid #ccc; border-radius:4px; cursor:pointer; text-align:left;">D) Madrid</button>
+        </div>
+        <div style="border:1px solid #ddd; padding:12px; border-radius:6px; text-align:center;">
+          Score: <b>8/10</b>
+        </div>
+      </div>
+    `;
+    createAppWindow("trivia", "Trivia", "🧠", body, 480, 420);
+};
+
+APPS.diceroller = function() {
+    const body = `
+      <div style="padding:24px; display:flex; flex-direction:column; align-items:center; gap:16px; height:100%;">
+        <div style="font-size:72px; font-weight:bold;">🎲</div>
+        <select style="padding:8px 12px; border:1px solid #ccc; border-radius:4px; font-size:14px;">
+          <option>d4</option>
+          <option>d6</option>
+          <option>d8</option>
+          <option>d20</option>
+        </select>
+        <button onclick="rollDice()" style="padding:12px 24px; background:#0067c0; color:#fff; border:none; border-radius:4px; cursor:pointer; font-size:16px;">Roll</button>
+        <div style="border:2px solid #0067c0; padding:24px; border-radius:6px; text-align:center;">
+          <div style="font-size:12px; color:#666;">Result</div>
+          <div id="diceResult" style="font-size:48px; font-weight:bold;">-</div>
+        </div>
+      </div>
+    `;
+    createAppWindow("diceroller", "Dice Roller", "🎲", body, 360, 420);
+};
+
+function rollDice() {
+    const result = Math.floor(Math.random() * 20) + 1;
+    document.getElementById("diceResult").textContent = result;
+}
+
+APPS.spinwheel = function() {
+    const body = `
+      <div style="padding:24px; display:flex; flex-direction:column; align-items:center; gap:16px; height:100%;">
+        <canvas id="wheelCanvas" width="300" height="300" style="border-radius:50%; box-shadow:0 4px 8px rgba(0,0,0,.2);"></canvas>
+        <button onclick="spinTheWheel()" style="padding:12px 24px; background:#0067c0; color:#fff; border:none; border-radius:4px; cursor:pointer; font-size:16px;">🌀 Spin</button>
+        <div id="wheelResult" style="font-weight:bold; font-size:18px; text-align:center;">-</div>
+      </div>
+    `;
+    createAppWindow("spinwheel", "Spin Wheel", "🌀", body, 400, 500);
+    setTimeout(() => {
+        const canvas = document.getElementById("wheelCanvas");
+        if (canvas) drawWheel();
+    }, 100);
+};
+
+function spinTheWheel() { document.getElementById("wheelResult").textContent = "🎉 " + ["Option 1", "Option 2", "Option 3", "Option 4"][Math.floor(Math.random()*4)]; }
+function drawWheel() { const canvas = document.getElementById("wheelCanvas"); if (!canvas) return; const ctx = canvas.getContext("2d"); ctx.fillStyle = "#ccc"; ctx.fillRect(0, 0, 300, 300); }
+
+// HELPERS
+function renderFileList() {
+    const list = document.getElementById("fileList");
+    if (!list) return;
+    const usageKb = (JSON.stringify(localStorage).length / 1024).toFixed(1);
+    list.innerHTML = [
+        ["📄", "project-brief.txt", "Text document"],
+        ["📁", "Design Mockups", "Folder"],
+        ["🖼️", "Wallpaper Library", "Media collection"],
+        ["⚙️", "settings.json", `${usageKb} KB localStorage snapshot`],
+        ["🧩", "Pinned Apps", "Shell preferences"]
+    ].map(([icon, name, meta]) => `
+      <div class="explorer-item">
+        <div style="font-size:24px; margin-bottom:10px;">${icon}</div>
+        <strong style="display:block; margin-bottom:4px;">${name}</strong>
+        <span style="font-size:11px; color:#64748b;">${meta}</span>
+      </div>`).join("");
+}
+function fileNavUp() { alert("Navigated up"); }
+function updateStorageDisplay() { const usage = (JSON.stringify(localStorage).length / 1024).toFixed(1); if (document.getElementById("storageUsage")) document.getElementById("storageUsage").textContent = usage + " KB"; }
+function clearAllData() {
+    if (!confirm("Reset shell preferences and desktop state?")) return;
+    if (window.resetShellData) window.resetShellData();
+    updateStorageDisplay();
 }
