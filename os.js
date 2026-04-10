@@ -112,7 +112,7 @@ const shell = {
     z: 20,
     startOpen: false,
     trayOpen: false,
-    cheatOpen: false,
+    Open: false,
     updateOpen: false,
     updateShownThisSession: false,
     konamiBuffer: []
@@ -949,3 +949,66 @@ function handleWallpaperUpload(event) {
     const file = event.target.files && event.target.files[0];
     if (!file) return;
     const reader = new FileReader();
+    reader.onload = () => {
+        shell.customWallpaper = reader.result;
+        saveValue(SHELL_KEYS.wallpaperCustom, shell.customWallpaper);
+        applyWallpaper(shell.wallpaper, shell.customWallpaper);
+        notify("Custom wallpaper", `${file.name} applied to the desktop.`);
+    };
+    reader.readAsDataURL(file);
+}
+window.handleWallpaperUpload = handleWallpaperUpload;
+
+function resetShellData() {
+    localStorage.removeItem(SHELL_KEYS.pins);
+    localStorage.removeItem(SHELL_KEYS.recent);
+    localStorage.removeItem(SHELL_KEYS.theme);
+    localStorage.removeItem(SHELL_KEYS.wallpaper);
+    localStorage.removeItem(SHELL_KEYS.wallpaperCustom);
+    localStorage.removeItem(SHELL_KEYS.notifications);
+    localStorage.removeItem(SHELL_KEYS.seenUpdateVersion);
+    shell.pins = [...DEFAULT_PINS];
+    shell.recent = [];
+    shell.notifications = [];
+    shell.theme = prefersDark() ? "dark" : "light";
+    shell.wallpaper = "aurora";
+    shell.customWallpaper = "";
+    applyTheme(shell.theme, false);
+    applyWallpaper(shell.wallpaper, shell.customWallpaper);
+    renderTaskbar();
+    renderStartMenu();
+    renderNotifications();
+    renderUpdateWindow();
+}
+window.resetShellData = resetShellData;
+
+function loadArray(key, fallback) {
+    try {
+        const value = JSON.parse(localStorage.getItem(key));
+        return Array.isArray(value) ? value : fallback;
+    } catch (_) {
+        return fallback;
+    }
+}
+
+function loadValue(key, fallback) {
+    try {
+        return localStorage.getItem(key) ?? fallback;
+    } catch (_) {
+        return fallback;
+    }
+}
+
+function saveValue(key, value) {
+    try {
+        localStorage.setItem(key, typeof value === "string" ? value : JSON.stringify(value));
+    } catch (_) {}
+}
+
+function unique(items) {
+    return [...new Set(items.filter(Boolean))];
+}
+
+function prefersDark() {
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
