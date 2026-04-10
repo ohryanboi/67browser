@@ -40,10 +40,26 @@
 <div id="desktop">
 
   <!-- BROWSER WINDOW -->
-  <div id="browserWindow" class="window">
+  <div id="browserWindow" class="window" data-app-id="browser">
     <div class="window-header">
       <div class="window-title-area">
-        <img class="window-icon" src="https://www.google.com/favicon.ico" onerror="this.style.display='none'">
+        <span class="window-icon shell-glyph shell-glyph-browser" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="6.2" fill="url(#navGradOuter)"/>
+            <path d="M8 3.2c2.8 0 5 2.2 5 5 0 .5-.1 1-.2 1.4H8.5L5.2 5.7A4.9 4.9 0 0 1 8 3.2Z" fill="url(#navGradInner)"/>
+            <path d="M4 10.1c.8 1.7 2.3 2.7 4 2.7 1.9 0 3.5-1.2 4.2-2.9l-3.1-.1-1.7 1.8L4 10.1Z" fill="#f8fbff" fill-opacity=".92"/>
+            <defs>
+              <linearGradient id="navGradOuter" x1="2" y1="2" x2="14" y2="14">
+                <stop offset="0" stop-color="#5ab4ff"/>
+                <stop offset="1" stop-color="#2563eb"/>
+              </linearGradient>
+              <linearGradient id="navGradInner" x1="5" y1="4" x2="12" y2="11">
+                <stop offset="0" stop-color="#7ef7d3"/>
+                <stop offset="1" stop-color="#1f75ff"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </span>
         <span class="window-title">Browser</span>
       </div>
       <div class="window-controls">
@@ -73,123 +89,96 @@
     <iframe id="browserFrame"></iframe>
   </div>
 
+  <div id="snapPreview" aria-hidden="true"></div>
+
   <!-- START MENU -->
-  <div id="startMenu">
-    <div id="startMenuHeader">All Apps</div>
-    <div id="startAppsGrid">
-      <button class="startAppBtn" onclick="launchApp('notepad')">
-        <span class="startAppIcon">📝</span>
-        <span class="startAppLabel">Notepad</span>
-      </button>
-      <button class="startAppBtn" onclick="launchApp('stickynotes')">
-        <span class="startAppIcon">🗒️</span>
-        <span class="startAppLabel">Sticky Notes</span>
-      </button>
-      <button class="startAppBtn" onclick="launchApp('calculator')">
-        <span class="startAppIcon">🖩</span>
-        <span class="startAppLabel">Calculator</span>
-      </button>
-      <button class="startAppBtn" onclick="launchApp('paint')">
-        <span class="startAppIcon">🎨</span>
-        <span class="startAppLabel">Paint</span>
-      </button>
-      <button class="startAppBtn" onclick="launchApp('codeeditor')">
-        <span class="startAppIcon">💻</span>
-        <span class="startAppLabel">Code Editor</span>
-      </button>
-      <button class="startAppBtn" onclick="launchApp('markdown')">
-        <span class="startAppIcon">📄</span>
-        <span class="startAppLabel">Markdown</span>
-      </button>
-      <button class="startAppBtn" onclick="launchApp('tts')">
-        <span class="startAppIcon">🔊</span>
-        <span class="startAppLabel">Text to Speech</span>
-      </button>
-      <button class="startAppBtn" onclick="launchApp('clock')">
-        <span class="startAppIcon">🕐</span>
-        <span class="startAppLabel">Clock</span>
-      </button>
-      <button class="startAppBtn" onclick="launchApp('stopwatch')">
-        <span class="startAppIcon">⏱️</span>
-        <span class="startAppLabel">Stopwatch</span>
-      </button>
-      <button class="startAppBtn" onclick="launchApp('converter')">
-        <span class="startAppIcon">📐</span>
-        <span class="startAppLabel">Converter</span>
-      </button>
-      <button class="startAppBtn" onclick="launchApp('snake')">
-        <span class="startAppIcon">🐍</span>
-        <span class="startAppLabel">Snake</span>
-      </button>
-      <button class="startAppBtn" onclick="launchApp('tetris')">
-        <span class="startAppIcon">🧱</span>
-        <span class="startAppLabel">Tetris</span>
-      </button>
-      <button class="startAppBtn" onclick="launchApp('minesweeper')">
-        <span class="startAppIcon">💣</span>
-        <span class="startAppLabel">Minesweeper</span>
-      </button>
-      <button class="startAppBtn" onclick="launchApp('g2048')">
-        <span class="startAppIcon">🔢</span>
-        <span class="startAppLabel">2048</span>
-      </button>
-      <button class="startAppBtn" onclick="launchApp('pong')">
-        <span class="startAppIcon">🏓</span>
-        <span class="startAppLabel">Pong</span>
-      </button>
-      <button class="startAppBtn" onclick="launchApp('flappy')">
-        <span class="startAppIcon">🐦</span>
-        <span class="startAppLabel">Flappy Bird</span>
-      </button>
-      <button class="startAppBtn" onclick="launchApp('breakout')">
-        <span class="startAppIcon">🧨</span>
-        <span class="startAppLabel">Breakout</span>
-      </button>
-      <button class="startAppBtn" onclick="launchApp('wordle')">
-        <span class="startAppIcon">📟</span>
-        <span class="startAppLabel">Wordle</span>
-      </button>
-      <button class="startAppBtn" onclick="launchApp('memory')">
-        <span class="startAppIcon">🃏</span>
-        <span class="startAppLabel">Memory</span>
-      </button>
-      <button class="startAppBtn" onclick="launchApp('tictactoe')">
-        <span class="startAppIcon">❌</span>
-        <span class="startAppLabel">Tic-Tac-Toe</span>
-      </button>
+  <div id="startMenu" aria-hidden="true">
+    <div class="start-search-row">
+      <input id="startSearch" type="text" placeholder="Search for apps, settings, or files">
+    </div>
+    <div class="start-section">
+      <div class="start-section-head">
+        <span>Pinned</span>
+        <button id="pinHintBtn" class="shell-link-btn" type="button">Pin apps</button>
+      </div>
+      <div id="startAppsGrid"></div>
+    </div>
+    <div class="start-section">
+      <div class="start-section-head">
+        <span>Recommended</span>
+        <button id="clearRecentBtn" class="shell-link-btn" type="button">Clear</button>
+      </div>
+      <div id="recommendedApps"></div>
+    </div>
+    <div id="startMenuFooter">
+      <div class="shell-user-chip">
+        <span class="shell-user-avatar">◉</span>
+        <div>
+          <strong>User</strong>
+          <span>Front-end shell</span>
+        </div>
+      </div>
+      <div class="start-footer-actions">
+        <button id="trayThemeToggle" class="start-footer-btn" type="button">Theme</button>
+        <button id="lockShellBtn" class="start-footer-btn" type="button">Lock</button>
+      </div>
     </div>
   </div>
 
+  <!-- NOTIFICATIONS -->
+  <aside id="notificationPanel" aria-hidden="true">
+    <div class="panel-head">
+      <div>
+        <h3>Notifications</h3>
+        <p>Recent desktop activity</p>
+      </div>
+      <button id="clearNotificationsBtn" class="shell-link-btn" type="button">Clear</button>
+    </div>
+    <div id="notificationList"></div>
+  </aside>
+
+  <!-- CHEAT MENU -->
+  <aside id="cheatMenu" aria-hidden="true">
+    <div class="panel-head">
+      <div>
+        <h3>Secret Cheat Menu</h3>
+        <p>Unlocked with a hidden code</p>
+      </div>
+      <button id="closeCheatBtn" class="shell-link-btn" type="button">Close</button>
+    </div>
+    <div class="cheat-grid">
+      <button class="cheat-btn" data-cheat="cascade">Cascade windows</button>
+      <button class="cheat-btn" data-cheat="matrix">Matrix wallpaper</button>
+      <button class="cheat-btn" data-cheat="celebrate">Confetti toast</button>
+      <button class="cheat-btn" data-cheat="pinall">Pin core apps</button>
+      <button class="cheat-btn" data-cheat="dark">Dark mode</button>
+      <button class="cheat-btn" data-cheat="light">Light mode</button>
+    </div>
+    <div class="cheat-hint">Hint: try the classic up-up-down-down sequence.</div>
+  </aside>
+
   <!-- TASKBAR -->
   <div id="taskbar">
-    <div id="taskStart">
-      <button id="startBtn" title="Start">⊞</button>
-    </div>
-    <div id="taskIcons">
-      <button class="taskBtn" id="browserTaskBtn" title="Browser">
-        <!-- Edge-style browser icon -->
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="edgeGrad1" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#0078d4"/>
-              <stop offset="100%" stop-color="#1b8bed"/>
-            </linearGradient>
-            <linearGradient id="edgeGrad2" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#1dc0a6"/>
-              <stop offset="100%" stop-color="#0078d4"/>
-            </linearGradient>
-          </defs>
-          <!-- Main arc -->
-          <path d="M21 11.5C21 16.75 16.75 21 11.5 21C6.25 21 2 16.75 2 11.5C2 6.25 6.25 2 11.5 2C16.75 2 21 6.25 21 11.5Z" fill="url(#edgeGrad1)"/>
-          <!-- Inner wave / e-shape -->
-          <path d="M6 13.5C6 10.46 8.46 8 11.5 8C13.6 8 15.4 9.2 16.3 11H8.5C8.5 11 8 11.5 8 12.5C8 14.43 9.57 16 11.5 16C12.72 16 13.8 15.36 14.43 14.4L16.1 15.5C15.1 17.03 13.41 18 11.5 18C8.46 18 6 15.54 6 12.5V13.5Z" fill="white"/>
-        </svg>
+    <div id="taskbarCenter">
+      <button id="startBtn" title="Start" type="button" aria-label="Open Start menu">
+        <span class="start-logo" aria-hidden="true">
+          <span></span><span></span><span></span><span></span>
+        </span>
       </button>
+      <div id="taskIcons"></div>
     </div>
-    <div id="systemTray">
-      <div id="clockDate"></div>
-      <div id="clock"></div>
-    </div>
+    <button id="systemTray" type="button" aria-label="Open notifications and quick status">
+      <div id="trayStatusIcons" aria-hidden="true">
+        <span class="tray-icon tray-wifi"></span>
+        <span class="tray-icon tray-volume"></span>
+        <span class="tray-icon tray-battery"></span>
+        <span class="tray-icon tray-bell"></span>
+      </div>
+      <div id="trayClockBlock">
+        <div id="clock"></div>
+        <div id="clockDate"></div>
+      </div>
+    </button>
   </div>
 
 
